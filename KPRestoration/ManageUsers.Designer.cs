@@ -30,7 +30,7 @@
         {
             this.menuManageUsers = new System.Windows.Forms.MenuStrip();
             this.addToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.userDGV = new System.Windows.Forms.DataGridView();
+            this.dgvUsers = new System.Windows.Forms.DataGridView();
             this.lblUserInfo = new System.Windows.Forms.Label();
             this.lblUsers = new System.Windows.Forms.Label();
             this.lblUserName = new System.Windows.Forms.Label();
@@ -44,12 +44,12 @@
             this.lastName = new System.Windows.Forms.TextBox();
             this.email = new System.Windows.Forms.TextBox();
             this.phone = new System.Windows.Forms.TextBox();
-            this.comboBox1 = new System.Windows.Forms.ComboBox();
+            this.cbRank = new System.Windows.Forms.ComboBox();
             this.btnEnable = new System.Windows.Forms.Button();
             this.btnSaveEdit = new System.Windows.Forms.Button();
             this.btnResetPass = new System.Windows.Forms.Button();
             this.menuManageUsers.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.userDGV)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.dgvUsers)).BeginInit();
             this.SuspendLayout();
             // 
             // menuManageUsers
@@ -70,14 +70,14 @@
             this.addToolStripMenuItem.Size = new System.Drawing.Size(69, 20);
             this.addToolStripMenuItem.Text = "New User";
             // 
-            // userDGV
+            // dgvUsers
             // 
-            this.userDGV.BorderStyle = System.Windows.Forms.BorderStyle.None;
-            this.userDGV.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
-            this.userDGV.Location = new System.Drawing.Point(279, 84);
-            this.userDGV.Name = "userDGV";
-            this.userDGV.Size = new System.Drawing.Size(643, 302);
-            this.userDGV.TabIndex = 1;
+            this.dgvUsers.BorderStyle = System.Windows.Forms.BorderStyle.None;
+            this.dgvUsers.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
+            this.dgvUsers.Location = new System.Drawing.Point(279, 84);
+            this.dgvUsers.Name = "dgvUsers";
+            this.dgvUsers.Size = new System.Drawing.Size(643, 302);
+            this.dgvUsers.TabIndex = 1;
             // 
             // lblUserInfo
             // 
@@ -198,17 +198,17 @@
             this.phone.Size = new System.Drawing.Size(150, 21);
             this.phone.TabIndex = 7;
             // 
-            // comboBox1
+            // cbRank
             // 
-            this.comboBox1.Enabled = false;
-            this.comboBox1.Items.AddRange(new object[] {
+            this.cbRank.Enabled = false;
+            this.cbRank.Items.AddRange(new object[] {
             "1",
             "2",
             "3"});
-            this.comboBox1.Location = new System.Drawing.Point(93, 279);
-            this.comboBox1.Name = "comboBox1";
-            this.comboBox1.Size = new System.Drawing.Size(121, 21);
-            this.comboBox1.TabIndex = 8;
+            this.cbRank.Location = new System.Drawing.Point(93, 279);
+            this.cbRank.Name = "cbRank";
+            this.cbRank.Size = new System.Drawing.Size(121, 21);
+            this.cbRank.TabIndex = 8;
             // 
             // btnEnable
             // 
@@ -254,7 +254,7 @@
             this.Controls.Add(this.btnResetPass);
             this.Controls.Add(this.btnSaveEdit);
             this.Controls.Add(this.btnEnable);
-            this.Controls.Add(this.comboBox1);
+            this.Controls.Add(this.cbRank);
             this.Controls.Add(this.phone);
             this.Controls.Add(this.email);
             this.Controls.Add(this.lastName);
@@ -268,7 +268,7 @@
             this.Controls.Add(this.lblUserName);
             this.Controls.Add(this.lblUsers);
             this.Controls.Add(this.lblUserInfo);
-            this.Controls.Add(this.userDGV);
+            this.Controls.Add(this.dgvUsers);
             this.Controls.Add(this.menuManageUsers);
             this.Font = new System.Drawing.Font("Tahoma", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.None;
@@ -279,7 +279,7 @@
             this.WindowState = System.Windows.Forms.FormWindowState.Maximized;
             this.menuManageUsers.ResumeLayout(false);
             this.menuManageUsers.PerformLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.userDGV)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.dgvUsers)).EndInit();
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -289,7 +289,7 @@
 
         private System.Windows.Forms.MenuStrip menuManageUsers;
         private System.Windows.Forms.ToolStripMenuItem addToolStripMenuItem;
-        private System.Windows.Forms.DataGridView userDGV;
+        private System.Windows.Forms.DataGridView dgvUsers;
         private System.Windows.Forms.Label lblUserInfo;
         private System.Windows.Forms.Label lblUsers;
         private System.Windows.Forms.Label lblUserName;
@@ -303,7 +303,7 @@
         private System.Windows.Forms.TextBox lastName;
         private System.Windows.Forms.TextBox email;
         private System.Windows.Forms.TextBox phone;
-        private System.Windows.Forms.ComboBox comboBox1;
+        private System.Windows.Forms.ComboBox cbRank;
         private System.Windows.Forms.Button btnEnable;
         private System.Windows.Forms.Button btnSaveEdit;
         private System.Windows.Forms.Button btnResetPass;

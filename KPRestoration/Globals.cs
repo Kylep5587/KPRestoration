@@ -20,6 +20,7 @@ namespace KPRestoration
          *  **************************************/
         public const string programTitle = "KP Restoration VMS";
         public const double programVersion = 1.0;
+        public const int adminLevel = 3;
 
         /*  Encryption function using SHA1 
          *      Used for user passwords

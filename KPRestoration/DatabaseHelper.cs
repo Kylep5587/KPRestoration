@@ -13,6 +13,7 @@ using System.Threading.Tasks;
 using System.Net.NetworkInformation;
 using MySql.Data.MySqlClient;
 using System.Windows.Forms;
+using System.Data;
 
 namespace KPRestoration
 {
@@ -42,7 +43,7 @@ namespace KPRestoration
         /*  Open database connection
          *  **************************************/
          private bool OpenConnection()
-        {
+         {
             try
             {
                 connection.Open();
@@ -64,7 +65,7 @@ namespace KPRestoration
                 }
                 return false;
             }
-        }
+         }
 
         /*  Close database connection
          *  **************************************/
@@ -79,6 +80,38 @@ namespace KPRestoration
             {
                 MessageBox.Show("Error: " + e.Message, "SQL Error", MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
                 return false;
+            }
+        }
+
+        /*  Populate targeted DGV with SQL Query results
+         *  **************************************/
+        public void populateDGV(DataGridView dgv, string query) 
+        {
+            try
+            {
+                if (this.OpenConnection() == true)
+                {
+                    // Store database data in dataAdapter
+                    MySqlDataAdapter dataAdapter = new MySqlDataAdapter();
+                    dataAdapter.SelectCommand = new MySqlCommand(query, connection);
+
+                    // Store data from adapter in DataTable
+                    DataTable table = new DataTable();
+                    dataAdapter.Fill(table);
+
+                    // Move data to BindingSource
+                    BindingSource bSource = new BindingSource();
+                    bSource.DataSource = table;
+
+                    // Dislay in DGV
+                    dgv.DataSource = bSource;
+
+                    this.connection.Close();
+                }
+            }
+            catch
+            {
+                this.CloseConnection();
             }
         }
 

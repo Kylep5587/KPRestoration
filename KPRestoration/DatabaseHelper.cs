@@ -20,10 +20,11 @@ namespace KPRestoration
     class DatabaseHelper
     {
         private MySqlConnection connection;
-        private string server;
-        private string dbName;
-        private string dbUser;
-        private string dbPass;
+        private static string server = Globals.dbHost;
+        private static string dbName = "KPRestoration";
+        private static string dbUser = "kyle";
+        private static string dbPass = "slack1";
+        public static string connectionString = "SERVER = " + server + "; DATABASE = " + dbName + "; UID = " + dbUser + "; PASSWORD = " + dbPass + ";";
 
         public DatabaseHelper()
         {
@@ -32,18 +33,13 @@ namespace KPRestoration
 
         private void Initialize()
         {
-            server = "RMSERVER";
-            dbName = "KPRestoration";
-            dbUser = "Kylep5587";
-            dbPass = "slack1";
-            string connectionString = "SERVER = " + server + "; DATABASE = " + dbName + "; UID = " + dbUser + "; PASSWORD = " + dbPass + ";";
             connection = new MySqlConnection(connectionString);
         }
 
         /*  Open database connection
          *  **************************************/
-         private bool OpenConnection()
-         {
+        public bool OpenConnection()
+        {
             try
             {
                 connection.Open();
@@ -56,20 +52,20 @@ namespace KPRestoration
                     case 0: // Cannot connect to server
                         MessageBox.Show("Failed to connect to SQL server. Please contact the system administrator.", "SQL Error", MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
                         break;
-                    case 1045:
+                    case 1045: // Invalid user/pass
                         MessageBox.Show("Invalid SQL username or password.", "Invalid Credentials", MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
                         break;
-                    default: // Invalid user/pass
+                    default:
                         MessageBox.Show("Error establishing SQL connection.", "SQL Error", MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
                         break;
                 }
                 return false;
             }
-         }
+        }
 
         /*  Close database connection
          *  **************************************/
-        private bool CloseConnection()
+        public bool CloseConnection()
         {
             try
             {
@@ -85,7 +81,7 @@ namespace KPRestoration
 
         /*  Populate targeted DGV with SQL Query results
          *  **************************************/
-        public void populateDGV(DataGridView dgv, string query) 
+        public bool populateDGV(DataGridView dgv, string query)
         {
             try
             {
@@ -107,11 +103,15 @@ namespace KPRestoration
                     dgv.DataSource = bSource;
 
                     this.connection.Close();
+                    return true;
                 }
+                else
+                    return false;
             }
             catch
             {
                 this.CloseConnection();
+                return false;
             }
         }
 
@@ -154,9 +154,9 @@ namespace KPRestoration
                     cmd.CommandText = query;
                     // Assign the connection 
                     cmd.Connection = connection;
-                    
+
                     cmd.ExecuteNonQuery();
-                    
+
                     this.CloseConnection();
                     return true;
                 }
@@ -182,9 +182,9 @@ namespace KPRestoration
             }
         }
 
-        /*  Get data
+        /*  Get data in string form
          *  **************************************/
-        public string getData(string query)
+        public string getString(string query)
         {
 
             string data;
@@ -217,5 +217,74 @@ namespace KPRestoration
             }
             return null;
         }
+
+        /*  Get data in integer form
+         *  **************************************/
+        public int getInt(string query)
+        {
+            int data;
+            if (this.OpenConnection() == true)
+            {
+                try
+                {
+                    //create mysql command
+                    MySqlCommand cmd = new MySqlCommand();
+
+                    //Assign the query using CommandText
+                    cmd.CommandText = query;
+
+                    //Assign the connection using Connection
+                    cmd.Connection = connection;
+
+                    //Execute query
+                    data = Convert.ToInt32(cmd.ExecuteScalar());
+
+                    //close connection
+                    this.CloseConnection();
+                    return data;
+                }
+                catch
+                {
+                    this.CloseConnection();
+                    return 0;
+                }
+
+            }
+            return 0;
+        }
+
+        /*  Get data in bool form
+         *  **************************************/
+        public bool getBool(string query, bool requireBool)
+        {
+            if (this.OpenConnection() == true)
+            {
+                try
+                {
+                    //create mysql command
+                    MySqlCommand cmd = new MySqlCommand();
+
+                    //Assign the query using CommandText
+                    cmd.CommandText = query;
+
+                    //Assign the connection using Connection
+                    cmd.Connection = connection;
+
+                    //Execute query
+                    cmd.ExecuteScalar();
+
+                    //close connection
+                    this.CloseConnection();
+                    return true;
+                }
+                catch
+                {
+                    this.CloseConnection();
+                    return false;
+                }
+            }
+            return false;
+        }
+
     }
 }

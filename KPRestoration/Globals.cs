@@ -18,9 +18,10 @@ namespace KPRestoration
     {
         /*  Global variables
          *  **************************************/
-        public const string programTitle = "KP Restoration VMS";
-        public const double programVersion = 1.0;
-        public const int adminLevel = 3;
+        public static string programTitle = "KP Restoration VMS";
+        public static double programVersion = 1.0;
+        public static int adminLevel = 3;
+        public const string dbHost = "rmserver";
 
         /*  Encryption function using SHA1 
          *      Used for user passwords
@@ -67,5 +68,6 @@ namespace KPRestoration
 
             return pingable;
         }
+
     }
 }

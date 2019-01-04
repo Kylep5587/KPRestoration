@@ -32,7 +32,7 @@
             this.panelMenu = new System.Windows.Forms.Panel();
             this.panel2 = new System.Windows.Forms.Panel();
             this.lblLogout = new System.Windows.Forms.LinkLabel();
-            this.lblUserName = new System.Windows.Forms.Label();
+            this.lblUsername = new System.Windows.Forms.Label();
             this.pictureBox1 = new System.Windows.Forms.PictureBox();
             this.btnUsers = new System.Windows.Forms.Button();
             this.btnReports = new System.Windows.Forms.Button();
@@ -68,7 +68,7 @@
             // panel2
             // 
             this.panel2.Controls.Add(this.lblLogout);
-            this.panel2.Controls.Add(this.lblUserName);
+            this.panel2.Controls.Add(this.lblUsername);
             this.panel2.Controls.Add(this.pictureBox1);
             this.panel2.Dock = System.Windows.Forms.DockStyle.Bottom;
             this.panel2.Location = new System.Drawing.Point(0, 541);
@@ -89,15 +89,15 @@
             this.lblLogout.Text = "Logout";
             this.lblLogout.VisitedLinkColor = System.Drawing.Color.FromArgb(((int)(((byte)(2)))), ((int)(((byte)(97)))), ((int)(((byte)(204)))));
             // 
-            // lblUserName
+            // lblUsername
             // 
-            this.lblUserName.AutoSize = true;
-            this.lblUserName.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(239)))), ((int)(((byte)(239)))), ((int)(((byte)(239)))));
-            this.lblUserName.Location = new System.Drawing.Point(77, 18);
-            this.lblUserName.Name = "lblUserName";
-            this.lblUserName.Size = new System.Drawing.Size(57, 13);
-            this.lblUserName.TabIndex = 1;
-            this.lblUserName.Text = "Kylep5587";
+            this.lblUsername.AutoSize = true;
+            this.lblUsername.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(239)))), ((int)(((byte)(239)))), ((int)(((byte)(239)))));
+            this.lblUsername.Location = new System.Drawing.Point(77, 18);
+            this.lblUsername.Name = "lblUsername";
+            this.lblUsername.Size = new System.Drawing.Size(57, 13);
+            this.lblUsername.TabIndex = 1;
+            this.lblUsername.Text = "Kylep5587";
             // 
             // pictureBox1
             // 
@@ -238,6 +238,7 @@
             // panelContent
             // 
             this.panelContent.AutoSize = true;
+            this.panelContent.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
             this.panelContent.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(239)))), ((int)(((byte)(239)))), ((int)(((byte)(239)))));
             this.panelContent.Dock = System.Windows.Forms.DockStyle.Fill;
             this.panelContent.Location = new System.Drawing.Point(220, 0);
@@ -255,6 +256,7 @@
             this.Name = "Main";
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
             this.Text = "Home";
+            this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.Main_FormClosing);
             this.panelMenu.ResumeLayout(false);
             this.panel2.ResumeLayout(false);
             this.panel2.PerformLayout();
@@ -279,7 +281,7 @@
         private System.Windows.Forms.Panel panel2;
         private System.Windows.Forms.PictureBox pictureBox1;
         private System.Windows.Forms.LinkLabel lblLogout;
-        private System.Windows.Forms.Label lblUserName;
+        private System.Windows.Forms.Label lblUsername;
     }
 }
 

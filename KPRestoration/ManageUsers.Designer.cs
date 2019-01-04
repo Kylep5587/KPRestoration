@@ -48,6 +48,12 @@
             this.btnEnable = new System.Windows.Forms.Button();
             this.btnSaveEdit = new System.Windows.Forms.Button();
             this.btnResetPass = new System.Windows.Forms.Button();
+            this.userSearch = new System.Windows.Forms.TextBox();
+            this.btnSearchUsers = new System.Windows.Forms.Button();
+            this.lblUserStatus = new System.Windows.Forms.Label();
+            this.cbUserStatus = new System.Windows.Forms.ComboBox();
+            this.btnDeleteUser = new System.Windows.Forms.Button();
+            this.lblCurrentUser = new System.Windows.Forms.Label();
             this.menuManageUsers.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.dgvUsers)).BeginInit();
             this.SuspendLayout();
@@ -69,21 +75,37 @@
             this.addToolStripMenuItem.Name = "addToolStripMenuItem";
             this.addToolStripMenuItem.Size = new System.Drawing.Size(69, 20);
             this.addToolStripMenuItem.Text = "New User";
+            this.addToolStripMenuItem.Click += new System.EventHandler(this.addToolStripMenuItem_Click);
             // 
             // dgvUsers
             // 
+            this.dgvUsers.AllowUserToAddRows = false;
+            this.dgvUsers.AllowUserToDeleteRows = false;
+            this.dgvUsers.AllowUserToResizeColumns = false;
+            this.dgvUsers.AllowUserToResizeRows = false;
+            this.dgvUsers.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.dgvUsers.AutoSizeColumnsMode = System.Windows.Forms.DataGridViewAutoSizeColumnsMode.Fill;
             this.dgvUsers.BorderStyle = System.Windows.Forms.BorderStyle.None;
             this.dgvUsers.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
-            this.dgvUsers.Location = new System.Drawing.Point(279, 84);
+            this.dgvUsers.Location = new System.Drawing.Point(334, 79);
+            this.dgvUsers.MinimumSize = new System.Drawing.Size(704, 379);
+            this.dgvUsers.MultiSelect = false;
             this.dgvUsers.Name = "dgvUsers";
-            this.dgvUsers.Size = new System.Drawing.Size(643, 302);
+            this.dgvUsers.ReadOnly = true;
+            this.dgvUsers.RowHeadersBorderStyle = System.Windows.Forms.DataGridViewHeaderBorderStyle.Single;
+            this.dgvUsers.RowHeadersVisible = false;
+            this.dgvUsers.RowTemplate.Resizable = System.Windows.Forms.DataGridViewTriState.False;
+            this.dgvUsers.SelectionMode = System.Windows.Forms.DataGridViewSelectionMode.FullRowSelect;
+            this.dgvUsers.Size = new System.Drawing.Size(704, 379);
             this.dgvUsers.TabIndex = 1;
+            this.dgvUsers.CellClick += new System.Windows.Forms.DataGridViewCellEventHandler(this.dgvUsers_CellClick);
             // 
             // lblUserInfo
             // 
             this.lblUserInfo.AutoSize = true;
             this.lblUserInfo.Font = new System.Drawing.Font("Tahoma", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.lblUserInfo.Location = new System.Drawing.Point(53, 51);
+            this.lblUserInfo.Location = new System.Drawing.Point(53, 43);
             this.lblUserInfo.Name = "lblUserInfo";
             this.lblUserInfo.Size = new System.Drawing.Size(148, 19);
             this.lblUserInfo.TabIndex = 2;
@@ -93,7 +115,7 @@
             // 
             this.lblUsers.AutoSize = true;
             this.lblUsers.Font = new System.Drawing.Font("Tahoma", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.lblUsers.Location = new System.Drawing.Point(584, 62);
+            this.lblUsers.Location = new System.Drawing.Point(659, 43);
             this.lblUsers.Name = "lblUsers";
             this.lblUsers.Size = new System.Drawing.Size(54, 19);
             this.lblUsers.TabIndex = 3;
@@ -147,7 +169,7 @@
             // lblAccess
             // 
             this.lblAccess.AutoSize = true;
-            this.lblAccess.Location = new System.Drawing.Point(12, 283);
+            this.lblAccess.Location = new System.Drawing.Point(12, 316);
             this.lblAccess.Name = "lblAccess";
             this.lblAccess.Size = new System.Drawing.Size(72, 13);
             this.lblAccess.TabIndex = 9;
@@ -201,11 +223,7 @@
             // cbRank
             // 
             this.cbRank.Enabled = false;
-            this.cbRank.Items.AddRange(new object[] {
-            "1",
-            "2",
-            "3"});
-            this.cbRank.Location = new System.Drawing.Point(93, 279);
+            this.cbRank.Location = new System.Drawing.Point(93, 312);
             this.cbRank.Name = "cbRank";
             this.cbRank.Size = new System.Drawing.Size(121, 21);
             this.cbRank.TabIndex = 8;
@@ -222,35 +240,121 @@
             this.btnEnable.TabIndex = 2;
             this.btnEnable.Text = "Enable Editing";
             this.btnEnable.UseVisualStyleBackColor = false;
+            this.btnEnable.Click += new System.EventHandler(this.btnEnable_Click);
             // 
             // btnSaveEdit
             // 
+            this.btnSaveEdit.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(43)))), ((int)(((byte)(43)))), ((int)(((byte)(43)))));
             this.btnSaveEdit.Enabled = false;
-            this.btnSaveEdit.Location = new System.Drawing.Point(15, 317);
+            this.btnSaveEdit.FlatAppearance.BorderSize = 0;
+            this.btnSaveEdit.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.btnSaveEdit.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(239)))), ((int)(((byte)(239)))), ((int)(((byte)(239)))));
+            this.btnSaveEdit.Location = new System.Drawing.Point(15, 350);
             this.btnSaveEdit.Name = "btnSaveEdit";
             this.btnSaveEdit.Size = new System.Drawing.Size(75, 23);
             this.btnSaveEdit.TabIndex = 9;
             this.btnSaveEdit.Text = "Save";
-            this.btnSaveEdit.UseVisualStyleBackColor = true;
+            this.btnSaveEdit.UseVisualStyleBackColor = false;
+            this.btnSaveEdit.Click += new System.EventHandler(this.btnSaveEdit_Click);
             // 
             // btnResetPass
             // 
-            this.btnResetPass.Location = new System.Drawing.Point(149, 317);
+            this.btnResetPass.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(43)))), ((int)(((byte)(43)))), ((int)(((byte)(43)))));
+            this.btnResetPass.FlatAppearance.BorderSize = 0;
+            this.btnResetPass.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.btnResetPass.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(239)))), ((int)(((byte)(239)))), ((int)(((byte)(239)))));
+            this.btnResetPass.Location = new System.Drawing.Point(149, 350);
             this.btnResetPass.Name = "btnResetPass";
             this.btnResetPass.Size = new System.Drawing.Size(94, 23);
             this.btnResetPass.TabIndex = 18;
             this.btnResetPass.TabStop = false;
             this.btnResetPass.Text = "Reset Password";
-            this.btnResetPass.UseVisualStyleBackColor = true;
+            this.btnResetPass.UseVisualStyleBackColor = false;
+            // 
+            // userSearch
+            // 
+            this.userSearch.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
+            this.userSearch.Location = new System.Drawing.Point(334, 469);
+            this.userSearch.Name = "userSearch";
+            this.userSearch.Size = new System.Drawing.Size(200, 21);
+            this.userSearch.TabIndex = 10;
+            // 
+            // btnSearchUsers
+            // 
+            this.btnSearchUsers.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(43)))), ((int)(((byte)(43)))), ((int)(((byte)(43)))));
+            this.btnSearchUsers.FlatAppearance.BorderSize = 0;
+            this.btnSearchUsers.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.btnSearchUsers.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(239)))), ((int)(((byte)(239)))), ((int)(((byte)(239)))));
+            this.btnSearchUsers.Location = new System.Drawing.Point(551, 468);
+            this.btnSearchUsers.Name = "btnSearchUsers";
+            this.btnSearchUsers.Size = new System.Drawing.Size(75, 23);
+            this.btnSearchUsers.TabIndex = 11;
+            this.btnSearchUsers.Text = "Search";
+            this.btnSearchUsers.UseVisualStyleBackColor = false;
+            // 
+            // lblUserStatus
+            // 
+            this.lblUserStatus.AutoSize = true;
+            this.lblUserStatus.Location = new System.Drawing.Point(12, 283);
+            this.lblUserStatus.Name = "lblUserStatus";
+            this.lblUserStatus.Size = new System.Drawing.Size(42, 13);
+            this.lblUserStatus.TabIndex = 19;
+            this.lblUserStatus.Text = "Status:";
+            // 
+            // cbUserStatus
+            // 
+            this.cbUserStatus.Enabled = false;
+            this.cbUserStatus.Items.AddRange(new object[] {
+            "Active",
+            "Suspended",
+            "Terminated"});
+            this.cbUserStatus.Location = new System.Drawing.Point(93, 280);
+            this.cbUserStatus.Name = "cbUserStatus";
+            this.cbUserStatus.Size = new System.Drawing.Size(121, 21);
+            this.cbUserStatus.TabIndex = 20;
+            // 
+            // btnDeleteUser
+            // 
+            this.btnDeleteUser.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(43)))), ((int)(((byte)(43)))), ((int)(((byte)(43)))));
+            this.btnDeleteUser.Enabled = false;
+            this.btnDeleteUser.FlatAppearance.BorderSize = 0;
+            this.btnDeleteUser.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.btnDeleteUser.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(239)))), ((int)(((byte)(239)))), ((int)(((byte)(239)))));
+            this.btnDeleteUser.Location = new System.Drawing.Point(919, 469);
+            this.btnDeleteUser.Name = "btnDeleteUser";
+            this.btnDeleteUser.Size = new System.Drawing.Size(119, 23);
+            this.btnDeleteUser.TabIndex = 21;
+            this.btnDeleteUser.TabStop = false;
+            this.btnDeleteUser.Text = "Delete Selected User";
+            this.btnDeleteUser.UseVisualStyleBackColor = false;
+            this.btnDeleteUser.Click += new System.EventHandler(this.btnDeleteUser_Click);
+            // 
+            // lblCurrentUser
+            // 
+            this.lblCurrentUser.AutoSize = true;
+            this.lblCurrentUser.ForeColor = System.Drawing.Color.DarkRed;
+            this.lblCurrentUser.Location = new System.Drawing.Point(13, 88);
+            this.lblCurrentUser.Name = "lblCurrentUser";
+            this.lblCurrentUser.Size = new System.Drawing.Size(68, 13);
+            this.lblCurrentUser.TabIndex = 23;
+            this.lblCurrentUser.Text = "Current user";
+            this.lblCurrentUser.Visible = false;
             // 
             // ManageUsers
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
+            this.AutoScroll = true;
             this.AutoSize = true;
             this.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
             this.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(239)))), ((int)(((byte)(239)))), ((int)(((byte)(239)))));
             this.ClientSize = new System.Drawing.Size(1048, 572);
+            this.Controls.Add(this.lblCurrentUser);
+            this.Controls.Add(this.btnDeleteUser);
+            this.Controls.Add(this.cbUserStatus);
+            this.Controls.Add(this.lblUserStatus);
+            this.Controls.Add(this.btnSearchUsers);
+            this.Controls.Add(this.userSearch);
             this.Controls.Add(this.btnResetPass);
             this.Controls.Add(this.btnSaveEdit);
             this.Controls.Add(this.btnEnable);
@@ -307,5 +411,11 @@
         private System.Windows.Forms.Button btnEnable;
         private System.Windows.Forms.Button btnSaveEdit;
         private System.Windows.Forms.Button btnResetPass;
+        private System.Windows.Forms.TextBox userSearch;
+        private System.Windows.Forms.Button btnSearchUsers;
+        private System.Windows.Forms.Label lblUserStatus;
+        private System.Windows.Forms.ComboBox cbUserStatus;
+        private System.Windows.Forms.Button btnDeleteUser;
+        private System.Windows.Forms.Label lblCurrentUser;
     }
 }

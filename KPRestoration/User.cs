@@ -7,7 +7,7 @@ using System.Windows.Forms;
 
 namespace KPRestoration
 {
-    class User
+    public class User
     {
         int id = 0;
         int rank = 1;
@@ -42,6 +42,8 @@ namespace KPRestoration
 
         /* Getters
          * *******************************/
+        public int getID() { return id; }
+        public string getStatus() { return status; }
         public int getRank() { return rank; }
         public string getFullName() { return firstName + " " + lastName; }
         public string getFName() { return firstName; }

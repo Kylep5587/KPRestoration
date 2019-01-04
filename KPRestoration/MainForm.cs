@@ -13,15 +13,18 @@ namespace KPRestoration
 {
     public partial class Main : Form
     {
+        User currentUser = new User();
 
-        public Main()
+        public Main(User userInfo)
         {
             InitializeComponent();
+            currentUser = userInfo;
+            lblUsername.Text = currentUser.getUsername();
         }
 
         private void btnUsers_Click(object sender, EventArgs e)
         {
-            ManageUsers userForm = new ManageUsers();
+            ManageUsers userForm = new ManageUsers(currentUser);
             userForm.TopLevel = false;
             userForm.AutoScroll = true;
             panelContent.Controls.Add(userForm);
@@ -29,6 +32,12 @@ namespace KPRestoration
 
             this.Text = "Manage Users";
             this.Refresh();
+        }
+
+        // Fixes: application remains running after closing window
+        private void Main_FormClosing(object sender, FormClosingEventArgs e)
+        {
+            Application.Exit();
         }
     }
 }

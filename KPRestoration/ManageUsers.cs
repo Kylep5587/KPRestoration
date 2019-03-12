@@ -16,7 +16,8 @@ namespace KPRestoration
         private DatabaseHelper db = new DatabaseHelper();
         private string query = null;
         private int selectedID;
-        
+        private string defaultDGVQuery = "SELECT userID, username, firstName, lastName, email, phone, rank, userStatus FROM Users ORDER BY lastName";
+
 
         /* Constructor
          * *****************************/
@@ -25,9 +26,10 @@ namespace KPRestoration
             InitializeComponent();
             currentUser = userInfo; 
             populateRanks(cbRank);
-            populateUserDGV();
+            populateUserDGV(defaultDGVQuery);
         }
 
+        // Possibly second constructor for for redirecting
 
         /* Populates access level dropdown with ranks 
          *  up to the current user's rank
@@ -41,9 +43,8 @@ namespace KPRestoration
 
         /* Populate user DGV headers and rows
          * *****************************/
-        private void populateUserDGV()
+        private void populateUserDGV(string query)
         {
-            query = "SELECT userID, username, firstName, lastName, email, phone, rank, userStatus FROM Users ORDER BY lastName";
             if (db.populateDGV(dgvUsers, query))
             {
                 dgvUsers.Columns[0].HeaderText = "ID";
@@ -88,7 +89,7 @@ namespace KPRestoration
             lblCurrentUser.Visible = false;
 
             userSearch.Select(); // Place cursor in search field
-            populateUserDGV();
+            populateUserDGV(defaultDGVQuery);
         }
 
 
@@ -151,10 +152,10 @@ namespace KPRestoration
                 query = "UPDATE Users SET username = '" + cleanUsername + "', firstName = '" + cleanFName + "', lastName = '" + cleanLName + "', email = '" + cleanEmail + "', phone = '" + cleanPhone + "', rank = '" + cleanRank + "', userStatus = '" + cleanUserStatus + "' WHERE userID = " + selectedID;
                 if (db.Update(query))
                 {
-                    MessageBox.Show("User information updated.", "Update Successful", MessageBoxButtons.OK, MessageBoxIcon.None);
+                    MessageBox.Show("User information updated.", "Update Successful", MessageBoxButtons.OK, MessageBoxIcon.Information);
                     resetFields();
                     disableFields();
-                    populateUserDGV();
+                    populateUserDGV(defaultDGVQuery);
                 }
                 else
                 {
@@ -230,6 +231,28 @@ namespace KPRestoration
                 }
             }
             
+        }
+
+        /* Populates dgvUsers with search results
+         *      Called when user types in search box or clicks search
+         * *****************************/
+        private void searchUsers()
+        {
+            string cleanUserSearch = userSearch.Text.ToString();
+            query = "SELECT userID, username, firstName, lastName, email, phone, rank, userStatus FROM Users WHERE (username LIKE '%" + cleanUserSearch + "%') OR (email LIKE '%" + cleanUserSearch + "%') OR (CONCAT(firstName, ' ', lastName) LIKE '%" + cleanUserSearch + "%') ORDER BY username";
+            populateUserDGV(query);
+        }
+
+
+        private void btnSearchUsers_Click(object sender, EventArgs e)
+        {
+            searchUsers();
+        }
+
+
+        private void userSearch_TextChanged(object sender, EventArgs e)
+        {
+            searchUsers();
         }
     }
 }

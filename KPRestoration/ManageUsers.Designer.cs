@@ -278,6 +278,7 @@
             this.userSearch.Name = "userSearch";
             this.userSearch.Size = new System.Drawing.Size(200, 21);
             this.userSearch.TabIndex = 10;
+            this.userSearch.TextChanged += new System.EventHandler(this.userSearch_TextChanged);
             // 
             // btnSearchUsers
             // 
@@ -291,6 +292,7 @@
             this.btnSearchUsers.TabIndex = 11;
             this.btnSearchUsers.Text = "Search";
             this.btnSearchUsers.UseVisualStyleBackColor = false;
+            this.btnSearchUsers.Click += new System.EventHandler(this.btnSearchUsers_Click);
             // 
             // lblUserStatus
             // 
@@ -377,6 +379,7 @@
             this.Font = new System.Drawing.Font("Tahoma", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.None;
             this.MainMenuStrip = this.menuManageUsers;
+            this.MaximumSize = new System.Drawing.Size(1048, 572);
             this.MinimumSize = new System.Drawing.Size(500, 400);
             this.Name = "ManageUsers";
             this.Text = "Manage Users";

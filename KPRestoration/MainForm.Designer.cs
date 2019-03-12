@@ -204,6 +204,7 @@
             this.btnVehicleManager.Text = "          Vehicle Manager";
             this.btnVehicleManager.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
             this.btnVehicleManager.UseVisualStyleBackColor = false;
+            this.btnVehicleManager.Click += new System.EventHandler(this.btnVehicleManager_Click);
             // 
             // btnHome
             // 
@@ -253,6 +254,7 @@
             this.ClientSize = new System.Drawing.Size(1284, 611);
             this.Controls.Add(this.panelContent);
             this.Controls.Add(this.panelMenu);
+            this.MinimumSize = new System.Drawing.Size(1300, 650);
             this.Name = "Main";
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
             this.Text = "Home";

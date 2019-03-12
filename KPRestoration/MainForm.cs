@@ -21,6 +21,7 @@ namespace KPRestoration
             currentUser = userInfo;
             lblUsername.Text = currentUser.getUsername();
         }
+        
 
         private void btnUsers_Click(object sender, EventArgs e)
         {
@@ -38,6 +39,17 @@ namespace KPRestoration
         private void Main_FormClosing(object sender, FormClosingEventArgs e)
         {
             Application.Exit();
+        }
+
+        private void btnVehicleManager_Click(object sender, EventArgs e)
+        {
+            VehicleManager vehicleForm = new VehicleManager(currentUser);
+            vehicleForm.TopLevel = false;
+            vehicleForm.AutoScroll = true;
+            panelContent.Controls.Add(vehicleForm);
+            vehicleForm.Show();
+            this.Text = "Vehicle Manager";
+            this.Refresh();
         }
     }
 }

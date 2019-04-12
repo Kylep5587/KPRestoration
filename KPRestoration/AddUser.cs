@@ -19,15 +19,15 @@ namespace KPRestoration
         {
             InitializeComponent();
             currentUser = userInfo;
-            populateRanks(cbRank);
+            PopulateRanks(cbRank);
         }
 
         /* Populates access level dropdown with ranks 
          *  up to the current user's rank
          * *****************************/
-        private void populateRanks(ComboBox cb)
+        private void PopulateRanks(ComboBox cb)
         {
-            for (int i = 1; i <= currentUser.getRank(); i++)
+            for (int i = 1; i <= currentUser.Rank; i++)
                 cb.Items.Add(i);
         }
 
@@ -39,7 +39,7 @@ namespace KPRestoration
         private void btnAddUser_Click(object sender, EventArgs e)
         {
             string cleanUsername = username.Text;
-            string cleanPassword = Globals.encrypt(initialPassword.Text);
+            string cleanPassword = Globals.Encrypt(initialPassword.Text);
             string cleanFName = firstName.Text;
             string cleanLName = lastName.Text;
             string cleanEmail = email.Text;
@@ -52,7 +52,7 @@ namespace KPRestoration
 
             // Check for username usage
             query = "SELECT username FROM Users WHERE username = '" + cleanUsername + "' LIMIT 1";
-            result = db.getString(query);
+            result = db.GetString(query);
 
             if (result == cleanUsername)
             {
@@ -62,7 +62,7 @@ namespace KPRestoration
 
             // Check for email address
             query = "SELECT userID FROM Users WHERE email = '" + cleanEmail + "' LIMIT 1";
-            result = db.getString(query);
+            result = db.GetString(query);
 
             if (result == cleanEmail)
             {

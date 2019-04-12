@@ -19,7 +19,7 @@ namespace KPRestoration
         {
             InitializeComponent();
             currentUser = userInfo;
-            lblUsername.Text = currentUser.getUsername();
+            lblUsername.Text = currentUser.Username;
         }
         
 

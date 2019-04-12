@@ -19,7 +19,7 @@ namespace KPRestoration
 {
     class DatabaseHelper
     {
-        private MySqlConnection connection;
+        public MySqlConnection conn;
         private static string server = Globals.dbHost;
         private static string dbName = "KPRestoration";
         private static string dbUser = "kyle";
@@ -33,7 +33,7 @@ namespace KPRestoration
 
         private void Initialize()
         {
-            connection = new MySqlConnection(connectionString);
+            conn = new MySqlConnection(connectionString);
         }
 
         /*  Open database connection
@@ -42,7 +42,7 @@ namespace KPRestoration
         {
             try
             {
-                connection.Open();
+                conn.Open();
                 return true;
             }
             catch (MySqlException e)
@@ -69,7 +69,7 @@ namespace KPRestoration
         {
             try
             {
-                connection.Close();
+                conn.Close();
                 return true;
             }
             catch (MySqlException e)
@@ -89,7 +89,7 @@ namespace KPRestoration
                 {
                     // Store database data in dataAdapter
                     MySqlDataAdapter dataAdapter = new MySqlDataAdapter();
-                    dataAdapter.SelectCommand = new MySqlCommand(query, connection);
+                    dataAdapter.SelectCommand = new MySqlCommand(query, conn);
 
                     // Store data from adapter in DataTable
                     DataTable table = new DataTable();
@@ -102,7 +102,7 @@ namespace KPRestoration
                     // Dislay in DGV
                     dgv.DataSource = bSource;
 
-                    this.connection.Close();
+                    this.conn.Close();
                     return true;
                 }
                 else
@@ -125,7 +125,7 @@ namespace KPRestoration
                 try
                 {
                     // Create command and assign the query and connection from the constructor
-                    MySqlCommand cmd = new MySqlCommand(query, connection);
+                    MySqlCommand cmd = new MySqlCommand(query, conn);
                     cmd.ExecuteNonQuery();
 
                     this.CloseConnection();
@@ -142,29 +142,22 @@ namespace KPRestoration
 
         /*  Update data
          *  **************************************/
-        public bool Update(string query)
+        public bool Update(MySqlCommand cmd)
         {
             try
             {
                 // Open connection
-                if (this.OpenConnection() == true)
+                if (OpenConnection() == true)
                 {
-                    MySqlCommand cmd = new MySqlCommand();
-                    // Assign the query using CommandText
-                    cmd.CommandText = query;
-                    // Assign the connection 
-                    cmd.Connection = connection;
-
                     cmd.ExecuteNonQuery();
-
-                    this.CloseConnection();
+                    CloseConnection();
                     return true;
                 }
             }
-            catch
+            catch (Exception ex)
             {
-
-                this.CloseConnection();
+                CloseConnection();
+                MessageBox.Show(ex.Message);
                 return false;
             }
             return false;
@@ -176,7 +169,7 @@ namespace KPRestoration
         {
             if (this.OpenConnection() == true)
             {
-                MySqlCommand cmd = new MySqlCommand(query, connection);
+                MySqlCommand cmd = new MySqlCommand(query, conn);
                 cmd.ExecuteNonQuery();
                 this.CloseConnection();
             }
@@ -184,7 +177,7 @@ namespace KPRestoration
 
         /*  Get data in string form
          *  **************************************/
-        public string getString(string query)
+        public string GetString(string query)
         {
 
             string data;
@@ -199,7 +192,7 @@ namespace KPRestoration
                     cmd.CommandText = query;
 
                     //Assign the connection using Connection
-                    cmd.Connection = connection;
+                    cmd.Connection = conn;
 
                     //Execute query
                     data = cmd.ExecuteScalar().ToString();
@@ -234,7 +227,7 @@ namespace KPRestoration
                     cmd.CommandText = query;
 
                     //Assign the connection using Connection
-                    cmd.Connection = connection;
+                    cmd.Connection = conn;
 
                     //Execute query
                     data = Convert.ToInt32(cmd.ExecuteScalar());
@@ -268,7 +261,7 @@ namespace KPRestoration
                     cmd.CommandText = query;
 
                     //Assign the connection using Connection
-                    cmd.Connection = connection;
+                    cmd.Connection = conn;
 
                     //Execute query
                     cmd.ExecuteScalar();

@@ -9,54 +9,47 @@ namespace KPRestoration
 {
     public class User
     {
-        int id = 0;
-        int rank = 1;
-        string firstName = null;
-        string lastName = null;
-        string email = null;
-        string phone = null;
-        string status = null;
-        string username = null;
+        // Members
+        private int id = 0;
+        private int rank = 1;
+        private string firstName = null;
+        private string lastName = null;
+        private string email = null;
+        private string phone = null;
+        private string status = null;
+        private string username = null;
+
+
+        /* Getters and setters
+         * *******************************/
+        public int Id { get => id; set => id = value; }
+        public int Rank { get => rank; set => rank = value; }
+        public string FirstName { get => firstName; set => firstName = value; }
+        public string LastName { get => lastName; set => lastName = value; }
+        public string Email { get => email; set => email = value; }
+        public string Phone { get => String.Format("{0:(###) ###-####}", Convert.ToDouble(phone)); set => phone = value; }
+        public string Status { get => status; set => status = value; }
+        public string Username { get => username; set => username = value; }
+
 
         public void createUser(int userID, int userRank, string userFName, string userLName, string userEmail, string userPhone, string userStatus, string userName)
         {
-            id = userID;
-            rank = userRank;
-            firstName = userFName;
-            lastName = userLName;
-            email = userEmail;
-            phone = userPhone;
-            status = userStatus;
-            username = userName;
+            Id = userID;
+            Rank = userRank;
+            FirstName = userFName;
+            LastName = userLName;
+            Email = userEmail;
+            Phone = userPhone;
+            Status = userStatus;
+            Username = userName;
         }
 
-        /* Setters
-         * *******************************/
-        public void setRank(int i) { rank = i; }
-        public void setFName(string s) { firstName = s; }
-        public void setLName(string s) { lastName = s; }
-        public void setEmail(string s) { email = s; }
-        public void setPhone(string s) { phone = s; }
-        public void setStatus(string s) { status = s; }
-        public void setUsername(string s) { username = s; }
-
-        /* Getters
-         * *******************************/
-        public int getID() { return id; }
-        public string getStatus() { return status; }
-        public int getRank() { return rank; }
-        public string getFullName() { return firstName + " " + lastName; }
-        public string getFName() { return firstName; }
-        public string getLName() { return lastName; }
-        public string getEmail() { return email; }
-        public string getPhone() { return String.Format("{0:(###) ###-####}", Convert.ToDouble(phone)); }
-        public string getUsername() { return username; }
 
         /* Verify user rank
          * *******************************/
-        public bool verifyRank(int requiredRank, Form form)
+        public bool VerifyRank(int requiredRank, Form form)
         {
-            if (requiredRank <= rank)
+            if (requiredRank <= Rank)
             {
                 return true;
             }

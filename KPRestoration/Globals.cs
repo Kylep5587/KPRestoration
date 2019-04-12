@@ -29,7 +29,7 @@ namespace KPRestoration
         /*  Encryption function using SHA1 
          *      Used for user passwords
          *  **************************************/
-        public static string encrypt(string value)
+        public static string Encrypt(string value)
         {
             var sha1 = System.Security.Cryptography.SHA1.Create();
             var inputBytes = Encoding.ASCII.GetBytes(value);
@@ -75,16 +75,36 @@ namespace KPRestoration
 
         /*  Formats string to currency
          *  **************************************/
-        public static string formatCurrency(string s)
+        public static string FormatCurrency(string s)
         {
             String.Format("{0:C}", @s);
             return s;
         }
 
 
+        /*  Formats string to a phone number 
+         *  Format: 000-000-0000
+         *  **************************************/
+        public static string FormatPhoneNumber(string s)
+        {
+            Regex ex = new Regex(@"[^\d]");
+            s = ex.Replace(s, "");                              // Remove everything except numbers
+            s = Convert.ToInt64(s).ToString("###-###-####");    // Convert to integer and then to given string format
+            return s;
+        }
+
+
+        /*  Checks for phone number format
+         *  **************************************/
+        public static bool IsPhoneNumber(string s)
+        {
+            return Regex.Match(s, @"\(?\d{3}\)?-? *\d{3}-? *-?\d{4}").Success;
+        }
+
+
         /*  Checks for currency format
          *  **************************************/
-        public static bool isCurrency(string s)
+        public static bool IsCurrency(string s)
         {
             bool validInput = false;
 

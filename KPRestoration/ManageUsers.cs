@@ -1,4 +1,5 @@
-﻿using System;
+﻿using MySql.Data.MySqlClient;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
@@ -7,6 +8,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using System.Net.Mail;
 
 namespace KPRestoration
 {
@@ -25,8 +27,8 @@ namespace KPRestoration
         {
             InitializeComponent();
             currentUser = userInfo; 
-            populateRanks(cbRank);
-            populateUserDGV(defaultDGVQuery);
+            PopulateRanks(cbRank);
+            PopulateUserDGV(defaultDGVQuery);
         }
 
         // Possibly second constructor for for redirecting
@@ -34,16 +36,16 @@ namespace KPRestoration
         /* Populates access level dropdown with ranks 
          *  up to the current user's rank
          * *****************************/
-        private void populateRanks(ComboBox cb)
+        private void PopulateRanks(ComboBox cb)
         {
-            for (int i=1; i <= currentUser.getRank(); i++)
+            for (int i=1; i <= currentUser.Rank; i++)
                 cb.Items.Add(i);
         }
 
 
         /* Populate user DGV headers and rows
          * *****************************/
-        private void populateUserDGV(string query)
+        private void PopulateUserDGV(string query)
         {
             if (db.populateDGV(dgvUsers, query))
             {
@@ -74,7 +76,7 @@ namespace KPRestoration
 
         /* Clears user information fields
          * *****************************/
-        private void resetFields()
+        private void ResetFields()
         {
             username.Clear();
             firstName.Clear();
@@ -89,13 +91,13 @@ namespace KPRestoration
             lblCurrentUser.Visible = false;
 
             userSearch.Select(); // Place cursor in search field
-            populateUserDGV(defaultDGVQuery);
+            PopulateUserDGV(defaultDGVQuery);
         }
 
 
         /* Disables all fields
          * *****************************/
-        private void disableFields()
+        private void DisableFields()
         {
             username.Enabled = false;
             firstName.Enabled = false;
@@ -134,32 +136,72 @@ namespace KPRestoration
          * *****************************/
         private void btnSaveEdit_Click(object sender, EventArgs e)
         {
-            string cleanUsername = username.Text.ToString();
-            string cleanFName = firstName.Text.ToString();
-            string cleanLName = lastName.Text.ToString();
-            string cleanEmail = email.Text.ToString();
-            string cleanPhone = phone.Text.ToString();
-            int cleanRank = Convert.ToInt32(cbRank.Text.ToString());
-            string cleanUserStatus = cbUserStatus.Text.ToString();
+            string phoneNumber = null;
+            bool isValidPhone = false;
+            bool isValidEmail = false;
+            string errors = null;
 
-            // Prevent user from modifying rank or access level of themselves
-            if (selectedID == currentUser.getID() && (cleanUsername != currentUser.getUsername() || cleanRank != currentUser.getRank() || cleanUserStatus != currentUser.getStatus()))
+            // Verify email is a valid email syntax
+            try
             {
-                MessageBox.Show("You cannot modify the rank or status of the account you are currently logged in on. To modify these values for this user, please login from a different account.", "Edit Restricted", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                MailAddress m = new MailAddress(email.Text);
+                isValidEmail = true;
             }
-            else
+            catch
             {
-                query = "UPDATE Users SET username = '" + cleanUsername + "', firstName = '" + cleanFName + "', lastName = '" + cleanLName + "', email = '" + cleanEmail + "', phone = '" + cleanPhone + "', rank = '" + cleanRank + "', userStatus = '" + cleanUserStatus + "' WHERE userID = " + selectedID;
-                if (db.Update(query))
+                isValidEmail = false;
+                errors += "\u2022 Invalid email address\n";
+            }
+
+            // Verify phone can be formatted properly if entered
+            if (phone.Text != "" || phone.Text != null)
+            {
+                if (Globals.IsPhoneNumber(phone.Text))
                 {
-                    MessageBox.Show("User information updated.", "Update Successful", MessageBoxButtons.OK, MessageBoxIcon.Information);
-                    resetFields();
-                    disableFields();
-                    populateUserDGV(defaultDGVQuery);
+                    phoneNumber = Globals.FormatPhoneNumber(phone.Text);
+                    isValidPhone = true; 
                 }
                 else
                 {
-                    MessageBox.Show("Error encountered while updating user information!", "Update Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    isValidPhone = false;
+                    errors += "\u2022 Invalid phone number\n";
+                }
+            }
+
+
+            if (!isValidEmail || !isValidPhone) // Show error and do not execute update query if invalid input is found
+                MessageBox.Show("Please fix the following errors and try again: \n\n" + errors + "\n", "Update Error", MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
+            else // Execute query if inpout is valid
+            {
+                // Prevent user from modifying rank or access level of themselves
+                if (selectedID == currentUser.Id && (username.Text != currentUser.Username || Convert.ToInt32(cbRank.Text.ToString()) != currentUser.Rank || cbUserStatus.Text != currentUser.Status))
+                {
+                    MessageBox.Show("You cannot modify the rank or status of the account you are currently logged in on. To modify these values for this user, please login from a different account.", "Edit Restricted", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                }
+                else
+                {
+                    string updateQuery = "UPDATE Users SET username = @user, firstName = @firstName, lastName = @lastName, email = @email, phone = @phone, rank = @rank, userStatus = @userStatus  WHERE userID = @selectedID";
+                    MySqlCommand cmd = new MySqlCommand(updateQuery, db.conn);
+                    cmd.Parameters.AddWithValue("@user", username.Text);
+                    cmd.Parameters.AddWithValue("@firstName", firstName.Text);
+                    cmd.Parameters.AddWithValue("@lastName", lastName.Text);
+                    cmd.Parameters.AddWithValue("@email", email.Text);
+                    cmd.Parameters.AddWithValue("@phone", phoneNumber);
+                    cmd.Parameters.AddWithValue("@rank", Convert.ToInt32(cbRank.Text.ToString()));
+                    cmd.Parameters.AddWithValue("@userStatus", cbUserStatus.Text.ToString());
+                    cmd.Parameters.AddWithValue("@selectedID", selectedID);
+
+                    if (db.Update(cmd))
+                    {
+                        MessageBox.Show("User information updated.", "Update Successful", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                        ResetFields();
+                        DisableFields();
+                        PopulateUserDGV(defaultDGVQuery);
+                    }
+                    else
+                    {
+                        MessageBox.Show("Error encountered while updating user information!", "Update Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    }
                 }
             }
         }
@@ -171,7 +213,7 @@ namespace KPRestoration
         {
             btnDeleteUser.Enabled = true;
             btnEnable.Enabled = true;
-            disableFields();
+            DisableFields();
 
             int index = e.RowIndex;
             DataGridViewRow selectedRow = dgvUsers.Rows[index];
@@ -186,7 +228,7 @@ namespace KPRestoration
             cbUserStatus.SelectedItem = selectedRow.Cells[7].Value.ToString();
 
             // Show or hide current user warning 
-            if (currentUser.getUsername() == selectedRow.Cells[1].Value.ToString())
+            if (currentUser.Username == selectedRow.Cells[1].Value.ToString())
                 lblCurrentUser.Visible = true;
             else
                 lblCurrentUser.Visible = false;
@@ -198,7 +240,7 @@ namespace KPRestoration
         {
             string deleteUsername = username.Text;
 
-            if (selectedID == currentUser.getID() || deleteUsername == currentUser.getUsername()) // Prevent deletion of current user
+            if (selectedID == currentUser.Id || deleteUsername == currentUser.Username) // Prevent deletion of current user
             {
                 MessageBox.Show("You cannot delete the current user. To delete this user, login from another account and try again.", "Delete Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
@@ -236,23 +278,23 @@ namespace KPRestoration
         /* Populates dgvUsers with search results
          *      Called when user types in search box or clicks search
          * *****************************/
-        private void searchUsers()
+        private void SearchUsers()
         {
             string cleanUserSearch = userSearch.Text.ToString();
             query = "SELECT userID, username, firstName, lastName, email, phone, rank, userStatus FROM Users WHERE (username LIKE '%" + cleanUserSearch + "%') OR (email LIKE '%" + cleanUserSearch + "%') OR (CONCAT(firstName, ' ', lastName) LIKE '%" + cleanUserSearch + "%') ORDER BY username";
-            populateUserDGV(query);
+            PopulateUserDGV(query);
         }
 
 
         private void btnSearchUsers_Click(object sender, EventArgs e)
         {
-            searchUsers();
+            SearchUsers();
         }
 
 
         private void userSearch_TextChanged(object sender, EventArgs e)
         {
-            searchUsers();
+            SearchUsers();
         }
     }
 }

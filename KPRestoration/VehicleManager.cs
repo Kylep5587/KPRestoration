@@ -162,13 +162,13 @@ namespace KPRestoration
                 cleanKBBValue = null;
 
             if (cleanPurchasePrice != null)
-                cleanPurchasePrice = Globals.formatCurrency(cleanPurchasePrice);
+                cleanPurchasePrice = Globals.FormatCurrency(cleanPurchasePrice);
 
             if (cleanEdmundsValue != null)
-                cleanEdmundsValue = Globals.formatCurrency(cleanEdmundsValue);
+                cleanEdmundsValue = Globals.FormatCurrency(cleanEdmundsValue);
 
             if (cleanKBBValue != null)
-                cleanKBBValue = Globals.formatCurrency(cleanKBBValue);
+                cleanKBBValue = Globals.FormatCurrency(cleanKBBValue);
 
 
             // Stores missing vehicle info fields
@@ -201,7 +201,7 @@ namespace KPRestoration
             {
                 if (entry.Value != "" && entry.Value != null)
                 {
-                    if (!Globals.isCurrency(entry.Value))
+                    if (!Globals.IsCurrency(entry.Value))
                         missingMonetaryFields.Add(entry.Key); // Add field to missing monetary value list
                 }
             }
@@ -282,7 +282,7 @@ namespace KPRestoration
             else
             {
                 // Set buyer ID to current user
-                int buyerID = currentUser.getID();
+                int buyerID = currentUser.Id;
 
                 // Get seller ID
                 int sellerID;  

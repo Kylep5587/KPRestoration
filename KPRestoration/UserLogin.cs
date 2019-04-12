@@ -30,10 +30,10 @@ namespace KPRestoration
             if ((txtUsername.Text == "SuperUser") && (txtPassword.Text == "password"))
             {
                 User defaultUser = new User();
-                defaultUser.setUsername(txtUsername.Text);
-                defaultUser.setFName("Default");
-                defaultUser.setLName("User");
-                defaultUser.setRank(3);
+                defaultUser.Username = txtUsername.Text;
+                defaultUser.FirstName = "Default";
+                defaultUser.LastName = "User";
+                defaultUser.Rank = 3;
                 MessageBox.Show("Login successful.");
                 Main form = new Main(defaultUser);
                 form.Show();
@@ -47,7 +47,7 @@ namespace KPRestoration
         {
             string[] userInfo = new string[8];
             bool verified = false;
-            string encryptedPassword = Globals.encrypt(password);
+            string encryptedPassword = Globals.Encrypt(password);
 
             string query = "SELECT userID FROM Users WHERE username = '" + username + "' AND pass = '" + encryptedPassword + "' LIMIT 1";
             verified = db.getBool(query, true);
@@ -55,10 +55,9 @@ namespace KPRestoration
             if (verified)
             {
                 // Get user info from database
-                MySqlConnection connection = new MySqlConnection(DatabaseHelper.connectionString);
-                connection.Open();
+                db.OpenConnection();
                 query = "SELECT userID, firstName, lastName, email, phone, rank, userStatus FROM Users WHERE username = '" + username + "' AND pass = '" + encryptedPassword + "' LIMIT 1";
-                MySqlCommand cmd = new MySqlCommand(query, connection);
+                MySqlCommand cmd = new MySqlCommand(query, db.conn);
                 MySqlDataReader dr = cmd.ExecuteReader();
 
                 // Store values in userInfo array
@@ -73,7 +72,7 @@ namespace KPRestoration
                     userInfo[6] = dr["userStatus"].ToString();
                     userInfo[7] = dr["rank"].ToString();
                 }
-                connection.Close();
+                db.CloseConnection();
 
                 // Stop login if user status not active
                 if (userInfo[6] != "Active")

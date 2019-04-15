@@ -47,7 +47,7 @@ namespace KPRestoration
          * *****************************/
         private void PopulateUserDGV(string query)
         {
-            if (db.populateDGV(dgvUsers, query))
+            if (db.PopulateDGV(dgvUsers, query))
             {
                 dgvUsers.Columns[0].HeaderText = "ID";
                 dgvUsers.Columns[1].HeaderText = "Username";
@@ -138,20 +138,11 @@ namespace KPRestoration
         {
             string phoneNumber = null;
             bool isValidPhone = false;
-            bool isValidEmail = false;
             string errors = null;
 
-            // Verify email is a valid email syntax
-            try
-            {
-                MailAddress m = new MailAddress(email.Text);
-                isValidEmail = true;
-            }
-            catch
-            {
-                isValidEmail = false;
-                errors += "\u2022 Invalid email address\n";
-            }
+            // Validate email
+            bool isValidEmail = Globals.IsEmail(email.Text);
+            if (!isValidEmail) { errors += "\u2022 Invalid email address\n"; }
 
             // Verify phone can be formatted properly if entered
             if (phone.Text != "" || phone.Text != null)
@@ -191,7 +182,7 @@ namespace KPRestoration
                     cmd.Parameters.AddWithValue("@userStatus", cbUserStatus.Text.ToString());
                     cmd.Parameters.AddWithValue("@selectedID", selectedID);
 
-                    if (db.Update(cmd))
+                    if (db.ExecuteCommand(cmd))
                     {
                         MessageBox.Show("User information updated.", "Update Successful", MessageBoxButtons.OK, MessageBoxIcon.Information);
                         ResetFields();
@@ -280,8 +271,7 @@ namespace KPRestoration
          * *****************************/
         private void SearchUsers()
         {
-            string cleanUserSearch = userSearch.Text.ToString();
-            query = "SELECT userID, username, firstName, lastName, email, phone, rank, userStatus FROM Users WHERE (username LIKE '%" + cleanUserSearch + "%') OR (email LIKE '%" + cleanUserSearch + "%') OR (CONCAT(firstName, ' ', lastName) LIKE '%" + cleanUserSearch + "%') ORDER BY username";
+            query = "SELECT userID, username, firstName, lastName, email, phone, rank, userStatus FROM Users WHERE (username LIKE '%" + userSearch.Text.ToString() + "%') OR (email LIKE '%"+ userSearch.Text.ToString() + "%') OR (CONCAT(firstName, ' ', lastName) LIKE '%" + userSearch.Text.ToString() + "%') ORDER BY username";
             PopulateUserDGV(query);
         }
 

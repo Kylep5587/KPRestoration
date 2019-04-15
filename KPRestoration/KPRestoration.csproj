@@ -52,6 +52,7 @@
     <Compile Include="AddUser.Designer.cs">
       <DependentUpon>AddUser.cs</DependentUpon>
     </Compile>
+    <Compile Include="Customer.cs" />
     <Compile Include="DatabaseHelper.cs" />
     <Compile Include="Globals.cs" />
     <Compile Include="MainForm.cs">
@@ -66,8 +67,11 @@
     <Compile Include="ManageUsers.Designer.cs">
       <DependentUpon>ManageUsers.cs</DependentUpon>
     </Compile>
+    <Compile Include="PotentialVehicle.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="PurchasedVehicle.cs" />
+    <Compile Include="TitleHolder.cs" />
     <Compile Include="User.cs" />
     <Compile Include="UserLogin.cs">
       <SubType>Form</SubType>
@@ -75,6 +79,7 @@
     <Compile Include="UserLogin.Designer.cs">
       <DependentUpon>UserLogin.cs</DependentUpon>
     </Compile>
+    <Compile Include="Vehicle.cs" />
     <Compile Include="VehicleManager.cs">
       <SubType>Form</SubType>
     </Compile>

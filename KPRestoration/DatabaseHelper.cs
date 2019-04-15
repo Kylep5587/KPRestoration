@@ -81,11 +81,11 @@ namespace KPRestoration
 
         /*  Populate targeted DGV with SQL Query results
          *  **************************************/
-        public bool populateDGV(DataGridView dgv, string query)
+        public bool PopulateDGV(DataGridView dgv, string query)
         {
             try
             {
-                if (this.OpenConnection() == true)
+                if (OpenConnection() == true)
                 {
                     // Store database data in dataAdapter
                     MySqlDataAdapter dataAdapter = new MySqlDataAdapter();
@@ -102,7 +102,7 @@ namespace KPRestoration
                     // Dislay in DGV
                     dgv.DataSource = bSource;
 
-                    this.conn.Close();
+                    CloseConnection();
                     return true;
                 }
                 else
@@ -110,7 +110,7 @@ namespace KPRestoration
             }
             catch
             {
-                this.CloseConnection();
+                CloseConnection();
                 return false;
             }
         }
@@ -140,28 +140,31 @@ namespace KPRestoration
             return false;
         }
 
-        /*  Update data
+
+        /*  Execute SQL query with parameters
          *  **************************************/
-        public bool Update(MySqlCommand cmd)
+        public bool ExecuteCommand(MySqlCommand cmd)
         {
-            try
+            //open connection
+            if (OpenConnection() == true)
             {
-                // Open connection
-                if (OpenConnection() == true)
+                try
                 {
+                    // Create command and assign the query and connection from the constructor
                     cmd.ExecuteNonQuery();
                     CloseConnection();
                     return true;
                 }
-            }
-            catch (Exception ex)
-            {
-                CloseConnection();
-                MessageBox.Show(ex.Message);
-                return false;
+                catch (Exception ex)
+                {
+                    MessageBox.Show("Datebase Error: " + ex);
+                    CloseConnection();
+                    return false;
+                }
             }
             return false;
         }
+
 
         /*  Delete data
          *  **************************************/
@@ -177,33 +180,22 @@ namespace KPRestoration
 
         /*  Get data in string form
          *  **************************************/
-        public string GetString(string query)
+        public string GetString(MySqlCommand cmd)
         {
 
             string data;
-            if (this.OpenConnection() == true)
+            if (OpenConnection())
             {
                 try
                 {
-                    //create mysql command
-                    MySqlCommand cmd = new MySqlCommand();
-
-                    //Assign the query using CommandText
-                    cmd.CommandText = query;
-
-                    //Assign the connection using Connection
-                    cmd.Connection = conn;
-
-                    //Execute query
+                    // Create command and assign the query and connection from the constructor
                     data = cmd.ExecuteScalar().ToString();
-
-                    //close connection
-                    this.CloseConnection();
+                    CloseConnection();
                     return data;
                 }
                 catch
                 {
-                    this.CloseConnection();
+                    CloseConnection();
                     return null;
                 }
 
@@ -213,10 +205,10 @@ namespace KPRestoration
 
         /*  Get data in integer form
          *  **************************************/
-        public int getInt(string query)
+        public int GetInt(string query)
         {
             int data;
-            if (this.OpenConnection() == true)
+            if (OpenConnection() == true)
             {
                 try
                 {
@@ -238,7 +230,7 @@ namespace KPRestoration
                 }
                 catch
                 {
-                    this.CloseConnection();
+                    CloseConnection();
                     return 0;
                 }
 
@@ -248,9 +240,9 @@ namespace KPRestoration
 
         /*  Get data in bool form
          *  **************************************/
-        public bool getBool(string query, bool requireBool)
+        public bool GetBool(string query, bool requireBool)
         {
-            if (this.OpenConnection() == true)
+            if (OpenConnection() == true)
             {
                 try
                 {
@@ -267,12 +259,12 @@ namespace KPRestoration
                     cmd.ExecuteScalar();
 
                     //close connection
-                    this.CloseConnection();
+                    CloseConnection();
                     return true;
                 }
                 catch
                 {
-                    this.CloseConnection();
+                    CloseConnection();
                     return false;
                 }
             }

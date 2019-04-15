@@ -16,7 +16,6 @@ namespace KPRestoration
     {
         bool isNewInstall = false;
         DatabaseHelper db = new DatabaseHelper();
-        User currentUser = new User();
 
         public UserLogin()
         {
@@ -29,11 +28,7 @@ namespace KPRestoration
         {
             if ((txtUsername.Text == "SuperUser") && (txtPassword.Text == "password"))
             {
-                User defaultUser = new User();
-                defaultUser.Username = txtUsername.Text;
-                defaultUser.FirstName = "Default";
-                defaultUser.LastName = "User";
-                defaultUser.Rank = 3;
+                User defaultUser = new User(txtUsername.Text, "Default", "User", 3);
                 MessageBox.Show("Login successful.");
                 Main form = new Main(defaultUser);
                 form.Show();
@@ -45,45 +40,59 @@ namespace KPRestoration
          * ****************************/
         private bool verifyCredentials(string username, string password)
         {
-            string[] userInfo = new string[8];
+            string[] userInfo = new string[9];
             bool verified = false;
             string encryptedPassword = Globals.Encrypt(password);
 
-            string query = "SELECT userID FROM Users WHERE username = '" + username + "' AND pass = '" + encryptedPassword + "' LIMIT 1";
-            verified = db.getBool(query, true);
+            string query = "SELECT * FROM Users WHERE username = @username AND pass = @password LIMIT 1";
+            MySqlCommand cmd = new MySqlCommand(query, db.conn);
+            cmd.Parameters.AddWithValue("@username", username);
+            cmd.Parameters.AddWithValue("@password", encryptedPassword);
+            verified = db.ExecuteCommand(cmd);
 
             if (verified)
             {
-                // Get user info from database
                 db.OpenConnection();
-                query = "SELECT userID, firstName, lastName, email, phone, rank, userStatus FROM Users WHERE username = '" + username + "' AND pass = '" + encryptedPassword + "' LIMIT 1";
-                MySqlCommand cmd = new MySqlCommand(query, db.conn);
                 MySqlDataReader dr = cmd.ExecuteReader();
-
+                
                 // Store values in userInfo array
                 if (dr.Read())
                 {
                     userInfo[0] = dr["userID"].ToString();
-                    userInfo[1] = username;
-                    userInfo[2] = dr["firstName"].ToString();
-                    userInfo[3] = dr["lastName"].ToString();
-                    userInfo[4] = dr["email"].ToString();
-                    userInfo[5] = dr["phone"].ToString();
-                    userInfo[6] = dr["userStatus"].ToString();
-                    userInfo[7] = dr["rank"].ToString();
+                    userInfo[1] = dr["username"].ToString();
+                    userInfo[2] = dr["pass"].ToString();
+                    userInfo[3] = dr["firstName"].ToString();
+                    userInfo[4] = dr["lastName"].ToString();
+                    userInfo[5] = dr["email"].ToString();
+                    userInfo[6] = dr["phone"].ToString();
+                    userInfo[7] = dr["userStatus"].ToString();
+                    userInfo[8] = dr["rank"].ToString();
                 }
                 db.CloseConnection();
 
+                // Create user object
+                User currentUser = new User(
+                    Convert.ToInt16(userInfo[0]),                // ID
+                    Convert.ToInt16(userInfo[8]),               // Rank
+                    userInfo[3],                                // First Name
+                    userInfo[4],                                // Last Name
+                    userInfo[5],                                // Email
+                    Globals.FormatPhoneNumber(userInfo[6]),     // Phone
+                    userInfo[7],                                // Status
+                    userInfo[1],                                // Username
+                    userInfo[2]                                 // Password
+                );
+
                 // Stop login if user status not active
-                if (userInfo[6] != "Active")
+                if (currentUser.Status != "Active")
                 {
                     lblError.Visible = true;
                     MessageBox.Show("Your credentials have been suspened or deactivated. Please contact a system administrator to regain access.", "Access Denied", MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
                     return false;
                 }
-                
+
                 // Set user data
-                currentUser.createUser(Convert.ToInt16(userInfo[0]), Convert.ToInt16(userInfo[7]), userInfo[2], userInfo[3], userInfo[4], userInfo[5], userInfo[6], userInfo[1]);
+
 
                 Main form = new Main(currentUser);
                 form.Show();
@@ -108,7 +117,7 @@ namespace KPRestoration
             }
 
             string query = "SELECT MAX(userID) FROM Users";
-            int result = db.getInt(query);
+            int result = db.GetInt(query);
 
             // If max user ID is 1, only default user credentials are present
             if (result == 0)

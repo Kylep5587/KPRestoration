@@ -9,6 +9,7 @@ using System;
 using System.Collections.Generic;
 using System.Drawing;
 using System.Linq;
+using System.Net.Mail;
 using System.Net.NetworkInformation;
 using System.Text;
 using System.Text.RegularExpressions;
@@ -26,6 +27,7 @@ namespace KPRestoration
         public const string dbHost = "rmserver";
         public static Color errorColor = Color.FromArgb(197, 0, 0);
 
+
         /*  Encryption function using SHA1 
          *      Used for user passwords
          *  **************************************/
@@ -42,6 +44,7 @@ namespace KPRestoration
             }
             return sb.ToString();
         }
+
 
         /*  Ping function used to verify MySQL server
          *      is online
@@ -75,10 +78,10 @@ namespace KPRestoration
 
         /*  Formats string to currency
          *  **************************************/
-        public static string FormatCurrency(string s)
+        public static string FormatCurrency(double currency)
         {
-            String.Format("{0:C}", @s);
-            return s;
+            string formattedCurrency = String.Format("{0:C}", currency);
+            return formattedCurrency;
         }
 
 
@@ -104,37 +107,38 @@ namespace KPRestoration
 
         /*  Checks for currency format
          *  **************************************/
-        public static bool IsCurrency(string s)
+        public static bool IsCurrency(decimal d)
         {
             bool validInput = false;
+            string value = d.ToString();
 
             Regex dollarSign = new Regex(@"^\$");
             Regex numeric = new Regex(@"^\d{1,5}");
             Regex currency = new Regex(@"\d{1,5}\.\d{2}");
 
-            if (numeric.IsMatch(s) || currency.IsMatch(s))
+            if (numeric.IsMatch(value) || currency.IsMatch(value))
                 validInput = true;
-            // \d{1,5} matches at least one digit and no more than 5
-
-            /*
-            if (numeric.IsMatch(s)) 
-            {
-                s = s = ".00";  // Add cents
-                validInput = true;
-            }
-            
-            else if (currency.IsMatch(s))
-            {
-                validInput = true;
-            }
-
-            if (validInput == true)
-            {
-                if (!dollarSign.IsMatch(s)) // Add dollar sign
-                    s = "$" + s;
-            }
-            */
+   
             return validInput;
         }
+
+
+        /*  Checks string for valid email format
+         *  **************************************/
+        public static bool IsEmail(string email)
+        {
+            bool isValidEmail = false;
+            try
+            {
+                MailAddress m = new MailAddress(email);
+                isValidEmail = true;
+            }
+            catch
+            {
+                isValidEmail = false;
+            }
+            return isValidEmail;
+        }
+
     }
 }

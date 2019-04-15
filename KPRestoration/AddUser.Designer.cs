@@ -30,11 +30,11 @@
         {
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(AddUser));
             this.cbRank = new System.Windows.Forms.ComboBox();
-            this.phone = new System.Windows.Forms.TextBox();
-            this.email = new System.Windows.Forms.TextBox();
-            this.lastName = new System.Windows.Forms.TextBox();
-            this.firstName = new System.Windows.Forms.TextBox();
-            this.username = new System.Windows.Forms.TextBox();
+            this.txtPhone = new System.Windows.Forms.TextBox();
+            this.txtEmail = new System.Windows.Forms.TextBox();
+            this.txtLastName = new System.Windows.Forms.TextBox();
+            this.txtFirstName = new System.Windows.Forms.TextBox();
+            this.txtUsername = new System.Windows.Forms.TextBox();
             this.lblAccess = new System.Windows.Forms.Label();
             this.lblFirstName = new System.Windows.Forms.Label();
             this.lblLastName = new System.Windows.Forms.Label();
@@ -44,7 +44,7 @@
             this.btnAddUser = new System.Windows.Forms.Button();
             this.lblUserInfo = new System.Windows.Forms.Label();
             this.btnCancelAdd = new System.Windows.Forms.Button();
-            this.initialPassword = new System.Windows.Forms.TextBox();
+            this.txtInitialPass = new System.Windows.Forms.TextBox();
             this.lblPassword = new System.Windows.Forms.Label();
             this.SuspendLayout();
             // 
@@ -56,45 +56,45 @@
             this.cbRank.Size = new System.Drawing.Size(121, 21);
             this.cbRank.TabIndex = 7;
             // 
-            // phone
+            // txtPhone
             // 
-            this.phone.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
-            this.phone.Location = new System.Drawing.Point(125, 222);
-            this.phone.Name = "phone";
-            this.phone.Size = new System.Drawing.Size(150, 20);
-            this.phone.TabIndex = 6;
+            this.txtPhone.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
+            this.txtPhone.Location = new System.Drawing.Point(125, 222);
+            this.txtPhone.Name = "txtPhone";
+            this.txtPhone.Size = new System.Drawing.Size(150, 20);
+            this.txtPhone.TabIndex = 6;
             // 
-            // email
+            // txtEmail
             // 
-            this.email.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
-            this.email.Location = new System.Drawing.Point(125, 189);
-            this.email.Name = "email";
-            this.email.Size = new System.Drawing.Size(150, 20);
-            this.email.TabIndex = 5;
+            this.txtEmail.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
+            this.txtEmail.Location = new System.Drawing.Point(125, 189);
+            this.txtEmail.Name = "txtEmail";
+            this.txtEmail.Size = new System.Drawing.Size(150, 20);
+            this.txtEmail.TabIndex = 5;
             // 
-            // lastName
+            // txtLastName
             // 
-            this.lastName.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
-            this.lastName.Location = new System.Drawing.Point(125, 156);
-            this.lastName.Name = "lastName";
-            this.lastName.Size = new System.Drawing.Size(150, 20);
-            this.lastName.TabIndex = 4;
+            this.txtLastName.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
+            this.txtLastName.Location = new System.Drawing.Point(125, 156);
+            this.txtLastName.Name = "txtLastName";
+            this.txtLastName.Size = new System.Drawing.Size(150, 20);
+            this.txtLastName.TabIndex = 4;
             // 
-            // firstName
+            // txtFirstName
             // 
-            this.firstName.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
-            this.firstName.Location = new System.Drawing.Point(125, 123);
-            this.firstName.Name = "firstName";
-            this.firstName.Size = new System.Drawing.Size(150, 20);
-            this.firstName.TabIndex = 3;
+            this.txtFirstName.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
+            this.txtFirstName.Location = new System.Drawing.Point(125, 123);
+            this.txtFirstName.Name = "txtFirstName";
+            this.txtFirstName.Size = new System.Drawing.Size(150, 20);
+            this.txtFirstName.TabIndex = 3;
             // 
-            // username
+            // txtUsername
             // 
-            this.username.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
-            this.username.Location = new System.Drawing.Point(125, 56);
-            this.username.Name = "username";
-            this.username.Size = new System.Drawing.Size(150, 20);
-            this.username.TabIndex = 1;
+            this.txtUsername.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
+            this.txtUsername.Location = new System.Drawing.Point(125, 56);
+            this.txtUsername.Name = "txtUsername";
+            this.txtUsername.Size = new System.Drawing.Size(150, 20);
+            this.txtUsername.TabIndex = 1;
             // 
             // lblAccess
             // 
@@ -188,13 +188,13 @@
             this.btnCancelAdd.UseVisualStyleBackColor = false;
             this.btnCancelAdd.Click += new System.EventHandler(this.btnCancelAdd_Click);
             // 
-            // initialPassword
+            // txtInitialPass
             // 
-            this.initialPassword.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
-            this.initialPassword.Location = new System.Drawing.Point(125, 89);
-            this.initialPassword.Name = "initialPassword";
-            this.initialPassword.Size = new System.Drawing.Size(150, 20);
-            this.initialPassword.TabIndex = 2;
+            this.txtInitialPass.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
+            this.txtInitialPass.Location = new System.Drawing.Point(125, 89);
+            this.txtInitialPass.Name = "txtInitialPass";
+            this.txtInitialPass.Size = new System.Drawing.Size(150, 20);
+            this.txtInitialPass.TabIndex = 2;
             // 
             // lblPassword
             // 
@@ -210,17 +210,17 @@
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(319, 344);
-            this.Controls.Add(this.initialPassword);
+            this.Controls.Add(this.txtInitialPass);
             this.Controls.Add(this.lblPassword);
             this.Controls.Add(this.btnCancelAdd);
             this.Controls.Add(this.lblUserInfo);
             this.Controls.Add(this.btnAddUser);
             this.Controls.Add(this.cbRank);
-            this.Controls.Add(this.phone);
-            this.Controls.Add(this.email);
-            this.Controls.Add(this.lastName);
-            this.Controls.Add(this.firstName);
-            this.Controls.Add(this.username);
+            this.Controls.Add(this.txtPhone);
+            this.Controls.Add(this.txtEmail);
+            this.Controls.Add(this.txtLastName);
+            this.Controls.Add(this.txtFirstName);
+            this.Controls.Add(this.txtUsername);
             this.Controls.Add(this.lblAccess);
             this.Controls.Add(this.lblFirstName);
             this.Controls.Add(this.lblLastName);
@@ -240,11 +240,11 @@
         #endregion
 
         private System.Windows.Forms.ComboBox cbRank;
-        private System.Windows.Forms.TextBox phone;
-        private System.Windows.Forms.TextBox email;
-        private System.Windows.Forms.TextBox lastName;
-        private System.Windows.Forms.TextBox firstName;
-        private System.Windows.Forms.TextBox username;
+        private System.Windows.Forms.TextBox txtPhone;
+        private System.Windows.Forms.TextBox txtEmail;
+        private System.Windows.Forms.TextBox txtLastName;
+        private System.Windows.Forms.TextBox txtFirstName;
+        private System.Windows.Forms.TextBox txtUsername;
         private System.Windows.Forms.Label lblAccess;
         private System.Windows.Forms.Label lblFirstName;
         private System.Windows.Forms.Label lblLastName;
@@ -255,7 +255,7 @@
         private System.Windows.Forms.Button btnCancel;
         private System.Windows.Forms.Label lblUserInfo;
         private System.Windows.Forms.Button btnCancelAdd;
-        private System.Windows.Forms.TextBox initialPassword;
+        private System.Windows.Forms.TextBox txtInitialPass;
         private System.Windows.Forms.Label lblPassword;
     }
 }

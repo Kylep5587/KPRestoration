@@ -24,8 +24,11 @@ namespace KPRestoration
         public VehicleManager(User userInfo)
         {
             InitializeComponent();
-            // Populate buyer and seller tables if empty
-
+            cbVehicleType.SelectedIndex = 0;
+            cbStatus.SelectedIndex = 0;
+            cbSeller.SelectedValue = "Add Later";
+            cbTitleHolder.SelectedValue = "Add Later";
+            cbPurchaseStatus.SelectedIndex = 0;
         }
 
 
@@ -113,111 +116,124 @@ namespace KPRestoration
          * ****************************/
         private void btnAddVehicle_Click(object sender, EventArgs e)
         {
-            string cleanYear, cleanMake, cleanColor;
+            bool vehicleAdded = false;
             string missingFieldMessage = "";
-            string formattingErrorMessage = "";
-            string formattedItems = "";
             string missingItems = "";
             string mySQLDateFormat = "yyyy-MM-dd";
-            DateTime result;
             CultureInfo provider = CultureInfo.InvariantCulture; // Needed for MySQL date conversion
 
-            // Handle null cbYear value
-            if (cbYear.SelectedItem == null)
-                cleanYear = "";
+            // Arrays containing fields which are required for potential purchases or purchased vehicles
+            string[] alwaysRequired = { "VIN", "Year", "Make", "Model", "Mileage", "Engine", "Transmission", "Color", "Condition", "edmundsValue", "kbbValue", "vehicleStatus" };
+            string[] purchasedRequired = { "Purchase Date", "Purchase Price", "Seller ID", "Title Holder ID" };
+            string[] potentialRequired = { "Asking Price", "Seller" };
+            List<string> missingFields = new List<string>();
+
+            // Get input values
+            int year = Convert.ToInt32(cbYear.SelectedItem);
+            string make;
+                if (cbMake.SelectedItem == null) { make = ""; } else { make = cbMake.SelectedItem.ToString(); } // Prevent null object error
+            string color;
+                if (cbColors.SelectedItem == null) { color = ""; } else { color = cbColors.SelectedItem.ToString(); }
+            string VIN = txtVIN.Text.ToString();
+            string model = txtModel.Text.ToString();
+            int mileage;
+                if (txtMileage.Text == "") { mileage = 0; } else { mileage = Convert.ToInt32(txtMileage.Text.Replace(",", "")); } // Prevent format error on empty string
+            string engine = txtEngine.Text.ToString();
+            string transmission = cbTransmission.SelectedItem.ToString();
+            string condition = cbCondition.SelectedItem.ToString();
+            DateTime purchaseDate = Convert.ToDateTime(datePurchased.Value.ToString(mySQLDateFormat));
+            decimal edmundsValue;
+                if (txtEdmundsValue.Text == "") { edmundsValue = 0; } else { edmundsValue = Convert.ToDecimal(txtEdmundsValue.Text.Replace(",", "")); }
+            decimal kbbValue;
+                if (txtKBBValue.Text == "") { kbbValue = 0; } else { kbbValue = Convert.ToDecimal(txtKBBValue.Text.Replace(",", "")); }
+            decimal purchasePrice;
+                if (txtPurhcasePrice.Text == "") { purchasePrice = 0; } else { purchasePrice = Convert.ToDecimal(txtPurhcasePrice.Text.Replace(",", "")); }
+            decimal askingPrice = 0;
+                if (txtAskingPrice.Text == "") { askingPrice = 0; } else { askingPrice = Convert.ToDecimal(txtAskingPrice.Text.Replace(",", "")); }
+            string titleHolder;
+                if (cbTitleHolder.SelectedItem == null) { titleHolder = ""; } else { titleHolder = cbTitleHolder.SelectedItem.ToString(); }
+            string notes = txtNotes.Text;
+
+            // Set buyer ID to current user
+            int buyerID = currentUser.Id;
+            // Get seller ID
+            int sellerID;
+            if (cbSeller.SelectedItem.ToString() == "Add Later" || cbSeller.SelectedItem.ToString() == "" || cbSeller.SelectedItem.ToString() == null)
+                sellerID = 1; // Default seller
             else
-                cleanYear = cbYear.SelectedItem.ToString();
+                sellerID = db.GetInt("SELECT sellerID FROM Sellers WHERE CONCAT(firstName, ' ', lastName) = '" + cbSeller.SelectedItem.ToString() + "' LIMIT 1;");
 
-            // Handle null cbMake value
-            if (cbMake.SelectedItem == null)
-                cleanMake = "";
+            // Get title holder ID
+            int titleHolderID;
+            if (cbTitleHolder.SelectedItem.ToString() == "Add Later" || cbTitleHolder.SelectedItem.ToString() == "" || cbTitleHolder.SelectedItem.ToString() == null)
+                titleHolderID = 1;
             else
-                cleanMake = cbMake.SelectedItem.ToString();
+                titleHolderID = db.GetInt("SELECT titleHolderID FROM TitleHolders WHERE CONCAT(firstName, ' ', lastName) = '" + cbTitleHolder.SelectedItem.ToString() + "' LIMIT 1;");
 
-            // Handle null cbColor value
-            if (cbColors.SelectedItem == null)
-                cleanColor = "";
-            else
-                cleanColor = cbColors.SelectedItem.ToString();
-
-            string cleanVIN = txtVIN.Text.ToString();
-            string cleanModel = txtModel.Text.ToString();
-            string cleanMileage = txtMileage.Text.ToString();
-            string cleanEngine = txtEngine.Text.ToString();
-            string cleanTransmission = cbTransmission.SelectedItem.ToString();
-            string cleanCondition = cbCondition.SelectedItem.ToString();
-            string cleanPurchaseDate = datePurchased.Value.ToShortDateString(); // Need to convert to mysql date
-                result = DateTime.ParseExact(cleanPurchaseDate,"m/dd/yyyy", new System.Globalization.CultureInfo("en-US"));
-                cleanPurchaseDate = result.ToString(mySQLDateFormat);
-            string cleanPurchasePrice = txtPurhcasePrice.Text.ToString();
-            string cleanSeller = cbSeller.SelectedItem.ToString();
-            string cleanTitleHolder = cbTitleHolder.SelectedItem.ToString();
-            string cleanEdmundsValue = txtEdmundsValue.Text.ToString();
-            string cleanKBBValue = txtKBBValue.Text.ToString();
-
-            // Format values to currency if provided
-            if (cleanEdmundsValue == "")
-                cleanEdmundsValue = null;
-            if (cleanKBBValue == "")
-                cleanKBBValue = null;
-
-            if (cleanPurchasePrice != null)
-                cleanPurchasePrice = Globals.FormatCurrency(cleanPurchasePrice);
-
-            if (cleanEdmundsValue != null)
-                cleanEdmundsValue = Globals.FormatCurrency(cleanEdmundsValue);
-
-            if (cleanKBBValue != null)
-                cleanKBBValue = Globals.FormatCurrency(cleanKBBValue);
-
-
-            // Stores missing vehicle info fields
-            IDictionary<string, string> vehicleInfo = new Dictionary<string, string>();
-            vehicleInfo["VIN"] = cleanVIN;
-            vehicleInfo["Year"] = cleanYear;
-            vehicleInfo["Make"] = cleanMake;
-            vehicleInfo["Model"] = cleanModel;
-            vehicleInfo["Mileage"] = cleanMileage;
-            vehicleInfo["Color"] = cleanColor;
-
-            // Add item to missingFields list if value not given by user.
-            IList<string> missingFields = new List<string>();
-            foreach (KeyValuePair<string, string> entry in vehicleInfo)
+            // Add proper required fields depending on type of vehicle being added and create object
+            if (cbVehicleType.SelectedItem == "Purchased")
             {
-                if (entry.Value == "" || entry.Value == " " || entry.Value == null)
-                    missingFields.Add(entry.Key);
+                string echeck = "Not Tested";
+                string seller;
+                    if (cbSeller.SelectedItem == null) { seller = ""; } else { seller = cbSeller.SelectedItem.ToString(); }
+                string vehicleStatus;
+                    if (cbPurchaseStatus.SelectedItem == null) { vehicleStatus = ""; } else { vehicleStatus = cbPurchaseStatus.SelectedItem.ToString(); }
+                PurchasedVehicle newVehicle = new PurchasedVehicle(VIN, year, make, model, mileage, engine, transmission, color, condition, edmundsValue, kbbValue, echeck, vehicleStatus, notes, purchaseDate, purchasePrice, buyerID, sellerID, titleHolderID);
+                if (newVehicle.VIN == "" || newVehicle.VIN.Length != 17 ) { missingFields.Add("VIN"); }
+                if (newVehicle.Year == 0) { missingFields.Add("Year"); }
+                if (newVehicle.Make == "") { missingFields.Add("Make"); }
+                if (newVehicle.Model == "") { missingFields.Add("Model"); }
+                if (newVehicle.Mileage == 0) { missingFields.Add("Mileage"); }
+                if (newVehicle.Engine == "") { missingFields.Add("Engine"); }
+                if (newVehicle.Color == "") { missingFields.Add("Color"); }
+                if (newVehicle.PurchaseDate == null) { missingFields.Add("Purhase Date"); }
+                if (newVehicle.PurchasePrice == 0 || !Globals.IsCurrency(newVehicle.PurchasePrice)) { missingFields.Add("Purchase Price"); } 
+                // Validate numeric fields if entered
+                if (newVehicle.EdmundsValue != 0) 
+                    if (!Globals.IsCurrency(newVehicle.EdmundsValue)) { missingFields.Add("Edmunds Value"); }
+
+                if (newVehicle.KbbValue != 0)
+                    if (!Globals.IsCurrency(newVehicle.KbbValue)) { missingFields.Add("KBB Value"); }
+
+                vehicleAdded = newVehicle.AddVehicle(newVehicle); // Attempt to insert into database
+            }
+            else
+            {
+                string seller = txtPotentialSeller.Text;
+                string vehicleStatus = cbStatus.SelectedItem.ToString();
+                    if (cbStatus.SelectedItem == null) { vehicleStatus = ""; } else { vehicleStatus = cbStatus.SelectedItem.ToString(); }
+                PotentialVehicle newVehicle = new PotentialVehicle(VIN, year, make, model, mileage, engine, transmission, color, condition, edmundsValue, kbbValue, vehicleStatus, notes, seller, askingPrice);
+                if (newVehicle.VIN == "" || newVehicle.VIN.Length < 17) { missingFields.Add("VIN"); }
+                if (newVehicle.Year == 0) { missingFields.Add("Year"); }
+                if (newVehicle.Make == "") { missingFields.Add("Make"); }
+                if (newVehicle.Model == "") { missingFields.Add("Model"); }
+                if (newVehicle.Mileage == 0) { missingFields.Add("Mileage"); }
+                if (newVehicle.Engine == "") { missingFields.Add("Engine"); }
+                if (newVehicle.Color == "") { missingFields.Add("Color"); }
+                if (newVehicle.Seller == "") { missingFields.Add("Seller"); }
+                if (newVehicle.AskingPrice == 0 || !Globals.IsCurrency(newVehicle.AskingPrice)) { missingFields.Add("Asking Price"); }
+                // Validate numeric fields if entered
+                if (newVehicle.EdmundsValue != 0)
+                    if (!Globals.IsCurrency(newVehicle.EdmundsValue)) { missingFields.Add("Edmunds Value"); }
+
+                if (newVehicle.KbbValue != 0)
+                    if (!Globals.IsCurrency(newVehicle.KbbValue)) { missingFields.Add("KBB Value"); }
+
+                vehicleAdded = newVehicle.AddVehicle(newVehicle); // Attempt to insert into database
             }
 
-            // Stores vehicle price related input fields 
-            IDictionary<string, string> priceInfo = new Dictionary<string, string>();
-            priceInfo["Purchase Price"] = cleanPurchasePrice;
-            priceInfo["Edmunds Value"] = cleanEdmundsValue;
-            priceInfo["KBB Value"] = cleanKBBValue;
-
-            IList<string> missingMonetaryFields = new List<string>();
-
-            // 
-            foreach (KeyValuePair<string, string> entry in priceInfo)
-            {
-                if (entry.Value != "" && entry.Value != null)
-                {
-                    if (!Globals.IsCurrency(entry.Value))
-                        missingMonetaryFields.Add(entry.Key); // Add field to missing monetary value list
-                }
-            }
-
-            if (missingFields.Count > 0 || missingMonetaryFields.Count > 0)
+            if (missingFields.Count > 0)
             {
                 resetLabels();
 
                 // Handle missing required fields
                 if (missingFields.Count > 0)
                 {
-                    missingFieldMessage = "The following items are required:\n ";
+                    missingFieldMessage = "Please enter valid information for the following:\n ";
 
                     foreach (var item in missingFields)
                     {
-                        missingItems += "\n" + item;
+                        missingItems += "\n\u2022 " + item;
 
                         // Highlight labels
                         switch (item)
@@ -240,22 +256,11 @@ namespace KPRestoration
                             case "Color":
                                 lblColor.ForeColor = Globals.errorColor;
                                 break;
-                        }
-                    }
-                }
-
-                // Handle imporoperly formatted items
-                if (missingMonetaryFields.Count > 0)
-                {
-                    formattingErrorMessage = "\n\nThe following fields must contain only numeric data: ";  // Only appears in error message if formatting errors are present
-                    // Highlight labels of improperly formatted numeric fields
-                    foreach (var item in missingMonetaryFields)
-                    {
-                        formattedItems += "\n" + item;
-                        switch (item)
-                        {
                             case "Purchase Price":
                                 lblPurchasePrice.ForeColor = Globals.errorColor;
+                                break;
+                            case "Purchase Date":
+                                lblPurchaseDate.ForeColor = Globals.errorColor;
                                 break;
                             case "Edmunds Value":
                                 lblEdmundsValue.ForeColor = Globals.errorColor;
@@ -263,89 +268,31 @@ namespace KPRestoration
                             case "KBB Value":
                                 lblKBB.ForeColor = Globals.errorColor;
                                 break;
+                            case "Seller":
+                                lblSeller.ForeColor = Globals.errorColor;
+                                break;
+                            case "Asking Price":
+                                lblAskingPrice.ForeColor = Globals.errorColor;
+                                break;
                         }
                     }
                 }
 
-                MessageBox.Show(missingFieldMessage + missingItems + formattingErrorMessage + formattedItems, "Input Error", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                MessageBox.Show(missingFieldMessage + missingItems, "Input Error", MessageBoxButtons.OK, MessageBoxIcon.Warning);
 
                 missingFields.Clear();
-                vehicleInfo.Clear();
-                missingMonetaryFields.Clear();
-                priceInfo.Clear();
                 missingItems = "";
-                formattedItems = "";
-                formattingErrorMessage = "";
                 missingFieldMessage = "";
             }
-
             else
             {
-                // Set buyer ID to current user
-                int buyerID = currentUser.Id;
-
-                // Get seller ID
-                int sellerID;  
-                if (cbSeller.SelectedItem.ToString() != "Add Later")
-                    sellerID = 1; // Default seller
-                else
-                {
-                    sellerID = db.getInt("SELECT sellerID FROM Sellers WHERE CONCAT(firstName, ' ', lastName) = '" + cbSeller.SelectedItem.ToString() + "' LIMIT 1;");
-                }
-
-                // Get title holder ID
-                int titleHolderID; 
-                if (cbTitleHolder.SelectedItem.ToString() != "Add Later")
-                    titleHolderID = 1;
-                else
-                {
-                    titleHolderID = db.getInt("SELECT titleHolderID FROM TitleHolders WHERE CONCAT(firstName, ' ', lastName) = '" + cbTitleHolder.SelectedItem.ToString() + "' LIMIT 1;");
-                }
-
-                // Get title holder id
-                // Insert data
-                string query = "INSERT INTO Vehicles (VIN, modelYear, make, model, mileage, engineSize, transmission, color, vehicleCondition, edmundsValue, kbbValue, echeckStatus, purchaseDate, listedDate, saleDate, purchasePrice, salePrice, vehicleStatus, sellerID, buyerID, titleHolderID, notes) " +
-                               "VALUES (@VIN, @ModelYear, @Make, @Model, @Mileage, @Engine, @Transmission, @Color, @Condition, @EdmundsValue, @KBBValue," +
-                               " @EcheckStatus, @PurchaseDate, @ListedDate, @SaleDate, @PurchasePrice, @SalePrice, @Status, @SellerID, @BuyerID, @TitleHolderID, @Notes);";
-                MySqlConnection connection = new MySqlConnection(DatabaseHelper.connectionString);
-                MySqlCommand cmd = new MySqlCommand(query, connection);
-                MySqlParameter param = new MySqlParameter();
-
-                cmd.Parameters.AddWithValue("@VIN", cleanVIN);
-                cmd.Parameters.AddWithValue("@ModelYear", cleanYear);
-                cmd.Parameters.AddWithValue("@Make", cleanMake);
-                cmd.Parameters.AddWithValue("@Model", cleanModel);
-                cmd.Parameters.AddWithValue("@Mileage", cleanMileage);
-                cmd.Parameters.AddWithValue("@Engine", cleanEngine);
-                cmd.Parameters.AddWithValue("@Transmission", cleanTransmission);
-                cmd.Parameters.AddWithValue("@Color", cleanColor);
-                cmd.Parameters.AddWithValue("@Condition", cleanYear);
-                cmd.Parameters.AddWithValue("@EdmundsValue", cleanEdmundsValue);
-                cmd.Parameters.AddWithValue("@KBBValue", cleanKBBValue);
-                cmd.Parameters.AddWithValue("@EcheckStatus", "Not Tested");
-                cmd.Parameters.AddWithValue("@PurchaseDate", cleanPurchaseDate); // Change to proper data format
-                cmd.Parameters.AddWithValue("@ListedDate", null);
-                cmd.Parameters.AddWithValue("@SaleDate", null);
-                cmd.Parameters.AddWithValue("@PurchasePrice", cleanPurchasePrice);
-                cmd.Parameters.AddWithValue("@SalePrice", null);
-                cmd.Parameters.AddWithValue("@Status", "Initial Inspection");
-                cmd.Parameters.AddWithValue("@SellerID", sellerID);
-                cmd.Parameters.AddWithValue("@BuyerID", buyerID);
-                cmd.Parameters.AddWithValue("@TitleHolderID", titleHolderID);
-                cmd.Parameters.AddWithValue("@Notes", txtNotes.Text.ToString());
-
-                connection.Open();
-                int rowsAffected = cmd.ExecuteNonQuery();
-                connection.Close();
-
-                if (rowsAffected == 0)
-                    MessageBox.Show("Error inserting vehicle information!", "Database Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                else
+                if (vehicleAdded)
                 {
                     MessageBox.Show("Vehicle information successfully added to the database.");
                     tabVehicleManager.TabPages[2].Show();
                 }
-                    
+                else
+                    MessageBox.Show("Error inserting vehicle information!", "Database Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
 
@@ -364,5 +311,20 @@ namespace KPRestoration
             lblEdmundsValue.ForeColor = SystemColors.ControlText;
             lblKBB.ForeColor = SystemColors.ControlText;
         }
+
+        private void cbVehicleType_SelectedValueChanged(object sender, EventArgs e)
+        {
+            if (cbVehicleType.SelectedItem == "Purchased")
+            {
+                gbPurchaseInfo.Visible = true;
+                gbSellerInformation.Visible = false;
+            }
+            else 
+            {
+                gbSellerInformation.Visible = true;
+                gbPurchaseInfo.Visible = false;
+            }
+        }
+        
     }
 }

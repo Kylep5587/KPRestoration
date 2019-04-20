@@ -21,55 +21,38 @@ namespace KPRestoration
         private string defaultDGVQuery = "SELECT userID, username, firstName, lastName, email, phone, rank, userStatus FROM Users ORDER BY lastName";
 
 
-        /* Constructor
+        /* Constructor with userInfo parameter
          * *****************************/
         public ManageUsers(User userInfo)
         {
             InitializeComponent();
             currentUser = userInfo; 
-            PopulateRanks(cbRank);
-            PopulateUserDGV(defaultDGVQuery);
-        }
-
-        // Possibly second constructor for for redirecting
-
-        /* Populates access level dropdown with ranks 
-         *  up to the current user's rank
-         * *****************************/
-        private void PopulateRanks(ComboBox cb)
-        {
-            for (int i=1; i <= currentUser.Rank; i++)
-                cb.Items.Add(i);
+            currentUser.PopulateRanks(cbRank);
+            currentUser.PopulateUserDGV(dgvUsers, defaultDGVQuery);
         }
 
 
-        /* Populate user DGV headers and rows
+        /* Empty Constructor used by AddUser.cs
          * *****************************/
-        private void PopulateUserDGV(string query)
+        public ManageUsers()
         {
-            if (db.PopulateDGV(dgvUsers, query))
-            {
-                dgvUsers.Columns[0].HeaderText = "ID";
-                dgvUsers.Columns[1].HeaderText = "Username";
-                dgvUsers.Columns[2].HeaderText = "First";
-                dgvUsers.Columns[3].HeaderText = "Last";
-                dgvUsers.Columns[4].HeaderText = "Email Address";
-                dgvUsers.Columns[5].HeaderText = "Phone";
-                dgvUsers.Columns[6].HeaderText = "Rank";
-                dgvUsers.Columns[7].HeaderText = "Status";
-                this.dgvUsers.Columns[4].AutoSizeMode = DataGridViewAutoSizeColumnMode.AllCells;    // Fixed issue with email address not being fully displayed
-            }
-            else
-                MessageBox.Show("There are currently no users in the database.", "No Users Found", MessageBoxButtons.OK, MessageBoxIcon.Warning);
-            
+
         }
 
 
         /* Handles "Add User" menu option
          * *****************************/
-        private void addToolStripMenuItem_Click(object sender, EventArgs e)
+        public void RefreshDGV()
         {
-            AddUser addUserForm = new AddUser(currentUser);
+            currentUser.PopulateUserDGV(dgvUsers, "SELECT userID, username, firstName, lastName, email, phone, rank, userStatus FROM Users ORDER BY lastName");
+        }
+
+
+        /* Handles "Add User" menu option
+         * *****************************/
+        private void btnAddUser_Click_1(object sender, EventArgs e)
+        {
+            AddUser addUserForm = new AddUser(currentUser, this);
             addUserForm.Show();
         }
 
@@ -91,7 +74,7 @@ namespace KPRestoration
             lblCurrentUser.Visible = false;
 
             userSearch.Select(); // Place cursor in search field
-            PopulateUserDGV(defaultDGVQuery);
+            currentUser.PopulateUserDGV(dgvUsers, defaultDGVQuery);
         }
 
 
@@ -187,7 +170,7 @@ namespace KPRestoration
                         MessageBox.Show("User information updated.", "Update Successful", MessageBoxButtons.OK, MessageBoxIcon.Information);
                         ResetFields();
                         DisableFields();
-                        PopulateUserDGV(defaultDGVQuery);
+                        currentUser.PopulateUserDGV(dgvUsers, defaultDGVQuery);
                     }
                     else
                     {
@@ -220,10 +203,17 @@ namespace KPRestoration
 
             // Show or hide current user warning 
             if (currentUser.Username == selectedRow.Cells[1].Value.ToString())
+            {
                 lblCurrentUser.Visible = true;
+                btnDeleteUser.Enabled = false;
+            }
             else
+            {
                 lblCurrentUser.Visible = false;
+                btnDeleteUser.Enabled = true;
+            }
         }
+
 
         /* Removes selected user from the database
          * *****************************/
@@ -250,11 +240,11 @@ namespace KPRestoration
                         try
                         {
                             db.Delete(query);
-                            MessageBox.Show("User removed from the database.");
+                            currentUser.PopulateUserDGV(dgvUsers, defaultDGVQuery);
                         }
                         catch
                         {
-                            MessageBox.Show("Error while attempting to remove the user from the database!", "Delete Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                            MessageBox.Show("Error while attempting to delete the user!", "Delete Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
                         }
                     }
                 }
@@ -266,13 +256,14 @@ namespace KPRestoration
             
         }
 
+
         /* Populates dgvUsers with search results
          *      Called when user types in search box or clicks search
          * *****************************/
         private void SearchUsers()
         {
             query = "SELECT userID, username, firstName, lastName, email, phone, rank, userStatus FROM Users WHERE (username LIKE '%" + userSearch.Text.ToString() + "%') OR (email LIKE '%"+ userSearch.Text.ToString() + "%') OR (CONCAT(firstName, ' ', lastName) LIKE '%" + userSearch.Text.ToString() + "%') ORDER BY username";
-            PopulateUserDGV(query);
+            currentUser.PopulateUserDGV(dgvUsers, query);
         }
 
 
@@ -286,5 +277,6 @@ namespace KPRestoration
         {
             SearchUsers();
         }
+        
     }
 }

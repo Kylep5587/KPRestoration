@@ -30,7 +30,6 @@ namespace KPRestoration
             userForm.AutoScroll = true;
             panelContent.Controls.Add(userForm);
             userForm.Show();
-
             this.Text = "Manage Users";
             this.Refresh();
         }

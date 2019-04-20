@@ -14,15 +14,25 @@ namespace KPRestoration
     public partial class AddUser : Form
     {
         User currentUser = new User();
+        ManageUsers owner;
         DatabaseHelper db = new DatabaseHelper();
+        Buyer newBuyer = new Buyer();
+        TitleHolder newHolder = new TitleHolder();
 
-        public AddUser(User userInfo)
+
+        /* Constructor - Requires two objects: 
+        *        User and ManageUsers
+        * *****************************************/
+        public AddUser(User userInfo, ManageUsers formOwner)
         {
             InitializeComponent();
+            owner = formOwner;  // Set the owner of this form 
+            this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.AddUser_FormClosing); // Calls the FormClosing method upon form closure
             currentUser = userInfo;
             PopulateRanks(cbRank);
             cbRank.SelectedIndex = 0;
         }
+
 
         /* Populates access level dropdown with ranks 
          *  up to the current user's rank
@@ -33,15 +43,20 @@ namespace KPRestoration
                 cb.Items.Add(i);
         }
 
+
+        /* Closes Add User window when "Cancel" is clicked
+        * *****************************************/
         private void btnCancelAdd_Click(object sender, EventArgs e)
         {
             this.Close();
         }
 
+
+        /* Attempts to add new user to database
+        * *****************************************/
         private void btnAddUser_Click(object sender, EventArgs e)
         {
             string password = Globals.Encrypt(txtInitialPass.Text);
-            string query = null;
             bool dataConflict = false;
             string errorMessage = "Please fix the following input errors: \n\n";
             string errors = "";
@@ -54,7 +69,7 @@ namespace KPRestoration
 
             // Phone validation and formatting
             if ((phone != "" && phone.Length >= 10) && Globals.IsPhoneNumber(phone))
-                Globals.FormatPhoneNumber(phone); 
+                phone = Globals.FormatPhoneNumber(phone); 
             else if (phone != "" && !Globals.IsPhoneNumber(phone))
             {
                 errors += "\u2022 Invalid phone number\n";
@@ -85,6 +100,7 @@ namespace KPRestoration
             {
                 Username = txtUsername.Text,
                 FirstName = txtFirstName.Text,
+                LastName = txtLastName.Text,
                 Password = password,
                 Email = txtEmail.Text,
                 Phone = phone,
@@ -92,7 +108,7 @@ namespace KPRestoration
                 Status = "Active",
                 RegistrationDate = DateTime.Now
             };
-            
+
 
             // Ensure username isn't already present
             if (newUser.Username != "")
@@ -117,42 +133,10 @@ namespace KPRestoration
 
             if (!dataConflict)
             {
-                // Insert data into Users database
-                query = "INSERT INTO Users (username, pass, firstName, lastName, email, phone, registrationDate, rank, userStatus) VALUES " +
-                "(@username, @password, @fName, @lName, @email, @phone, @dateAdded, @rank, @status)";
-                MySqlCommand addUserCMD = new MySqlCommand(query, db.conn);
-                addUserCMD.Parameters.AddWithValue("@username", newUser.Username);
-                addUserCMD.Parameters.AddWithValue("@password", newUser.Password);
-                addUserCMD.Parameters.AddWithValue("@fName", newUser.FirstName);
-                addUserCMD.Parameters.AddWithValue("@lName", newUser.LastName);
-                addUserCMD.Parameters.AddWithValue("@email", newUser.Email);
-                addUserCMD.Parameters.AddWithValue("@phone", newUser.Phone);
-                addUserCMD.Parameters.AddWithValue("@dateAdded", newUser.RegistrationDate);
-                addUserCMD.Parameters.AddWithValue("@rank", newUser.Rank);
-                addUserCMD.Parameters.AddWithValue("@status", newUser.Status);
-                bool userCreated = db.ExecuteCommand(addUserCMD);
-
-                // Insert data into Buyers table - a buyer is created for each user
-                query = "INSERT INTO Buyers (firstName, lastName, phone, email, buyerStatus) VALUES " +
-                "(@fName, @lName, @email, @phone, @status)";
-                MySqlCommand addBuyerCMD = new MySqlCommand(query, db.conn);
-                addBuyerCMD.Parameters.AddWithValue("@fName", newUser.FirstName);
-                addBuyerCMD.Parameters.AddWithValue("@lName", newUser.LastName);
-                addBuyerCMD.Parameters.AddWithValue("@email", newUser.Email);
-                addBuyerCMD.Parameters.AddWithValue("@phone", newUser.Phone);
-                addBuyerCMD.Parameters.AddWithValue("@status", newUser.Status);
-                bool buyerCreated = db.ExecuteCommand(addBuyerCMD);
-
-                // Insert data into TitleHolders table - a TitleHolder is created for each user
-                query = "INSERT INTO TitleHolders (firstName, lastName, phone, email, buyerStatus) VALUES " +
-                "(@fName, @lName, @email, @phone, @status)";
-                MySqlCommand addHolderCMD = new MySqlCommand(query, db.conn);
-                addHolderCMD.Parameters.AddWithValue("@fName", newUser.FirstName);
-                addHolderCMD.Parameters.AddWithValue("@lName", newUser.LastName);
-                addHolderCMD.Parameters.AddWithValue("@email", newUser.Email);
-                addHolderCMD.Parameters.AddWithValue("@phone", newUser.Phone);
-                addHolderCMD.Parameters.AddWithValue("@status", newUser.Status);
-                bool holderCreated = db.ExecuteCommand(addHolderCMD);
+                // Insert data into Users, Buyers, and TitleHolders tables - a buyer and title holder is created when a user is created
+                bool userCreated = newUser.AddUser();
+                bool buyerCreated = newBuyer.AddBuyer(newUser.FirstName, newUser.LastName, newUser.Phone, newUser.Email, newUser.Status);    
+                bool holderCreated = newHolder.AddTitleHolder(newUser.FirstName, newUser.LastName, newUser.Phone, newUser.Email, newUser.Status);
 
                 if (userCreated && buyerCreated && holderCreated)
                 {
@@ -164,8 +148,16 @@ namespace KPRestoration
             }
             else
             {
-                MessageBox.Show(errorMessage + errors, "Database Error", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                MessageBox.Show(errorMessage + errors, "Invalid Data", MessageBoxButtons.OK, MessageBoxIcon.Warning);
             }
+        }
+
+
+        /* Refreshes userDGV when Add User window is closed
+        * *****************************************/
+        private void AddUser_FormClosing(object sender, FormClosingEventArgs e)
+        {
+            owner.RefreshDGV();
         }
     }
 }

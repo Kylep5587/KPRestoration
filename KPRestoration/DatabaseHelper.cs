@@ -146,7 +146,7 @@ namespace KPRestoration
         public bool ExecuteCommand(MySqlCommand cmd)
         {
             //open connection
-            if (OpenConnection() == true)
+            if (OpenConnection())
             {
                 try
                 {
@@ -157,7 +157,6 @@ namespace KPRestoration
                 }
                 catch (Exception ex)
                 {
-                    MessageBox.Show("Datebase Error: " + ex);
                     CloseConnection();
                     return false;
                 }

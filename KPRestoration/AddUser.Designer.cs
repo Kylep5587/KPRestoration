@@ -44,8 +44,8 @@
             this.btnAddUser = new System.Windows.Forms.Button();
             this.lblUserInfo = new System.Windows.Forms.Label();
             this.btnCancelAdd = new System.Windows.Forms.Button();
-            this.txtInitialPass = new System.Windows.Forms.TextBox();
             this.lblPassword = new System.Windows.Forms.Label();
+            this.txtInitialPass = new System.Windows.Forms.TextBox();
             this.SuspendLayout();
             // 
             // cbRank
@@ -188,14 +188,6 @@
             this.btnCancelAdd.UseVisualStyleBackColor = false;
             this.btnCancelAdd.Click += new System.EventHandler(this.btnCancelAdd_Click);
             // 
-            // txtInitialPass
-            // 
-            this.txtInitialPass.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
-            this.txtInitialPass.Location = new System.Drawing.Point(125, 89);
-            this.txtInitialPass.Name = "txtInitialPass";
-            this.txtInitialPass.Size = new System.Drawing.Size(150, 20);
-            this.txtInitialPass.TabIndex = 2;
-            // 
             // lblPassword
             // 
             this.lblPassword.AutoSize = true;
@@ -204,6 +196,15 @@
             this.lblPassword.Size = new System.Drawing.Size(56, 13);
             this.lblPassword.TabIndex = 27;
             this.lblPassword.Text = "Password:";
+            // 
+            // txtInitialPass
+            // 
+            this.txtInitialPass.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
+            this.txtInitialPass.Location = new System.Drawing.Point(125, 89);
+            this.txtInitialPass.Name = "txtInitialPass";
+            this.txtInitialPass.PasswordChar = '*';
+            this.txtInitialPass.Size = new System.Drawing.Size(150, 20);
+            this.txtInitialPass.TabIndex = 2;
             // 
             // AddUser
             // 
@@ -232,6 +233,7 @@
             this.Name = "AddUser";
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
             this.Text = "Add New User";
+            this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.AddUser_FormClosing);
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -255,7 +257,7 @@
         private System.Windows.Forms.Button btnCancel;
         private System.Windows.Forms.Label lblUserInfo;
         private System.Windows.Forms.Button btnCancelAdd;
-        private System.Windows.Forms.TextBox txtInitialPass;
         private System.Windows.Forms.Label lblPassword;
+        private System.Windows.Forms.TextBox txtInitialPass;
     }
 }

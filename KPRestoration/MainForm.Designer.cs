@@ -62,7 +62,7 @@
             this.panelMenu.Dock = System.Windows.Forms.DockStyle.Left;
             this.panelMenu.Location = new System.Drawing.Point(0, 0);
             this.panelMenu.Name = "panelMenu";
-            this.panelMenu.Size = new System.Drawing.Size(220, 611);
+            this.panelMenu.Size = new System.Drawing.Size(220, 691);
             this.panelMenu.TabIndex = 0;
             // 
             // panel2
@@ -71,7 +71,7 @@
             this.panel2.Controls.Add(this.lblUsername);
             this.panel2.Controls.Add(this.pictureBox1);
             this.panel2.Dock = System.Windows.Forms.DockStyle.Bottom;
-            this.panel2.Location = new System.Drawing.Point(0, 541);
+            this.panel2.Location = new System.Drawing.Point(0, 621);
             this.panel2.Name = "panel2";
             this.panel2.Padding = new System.Windows.Forms.Padding(10, 10, 0, 0);
             this.panel2.Size = new System.Drawing.Size(220, 70);
@@ -244,16 +244,17 @@
             this.panelContent.Dock = System.Windows.Forms.DockStyle.Fill;
             this.panelContent.Location = new System.Drawing.Point(220, 0);
             this.panelContent.Name = "panelContent";
-            this.panelContent.Size = new System.Drawing.Size(1064, 611);
+            this.panelContent.Size = new System.Drawing.Size(1214, 691);
             this.panelContent.TabIndex = 1;
             // 
             // Main
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(1284, 611);
+            this.ClientSize = new System.Drawing.Size(1434, 691);
             this.Controls.Add(this.panelContent);
             this.Controls.Add(this.panelMenu);
+            this.IsMdiContainer = true;
             this.MinimumSize = new System.Drawing.Size(1300, 650);
             this.Name = "Main";
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;

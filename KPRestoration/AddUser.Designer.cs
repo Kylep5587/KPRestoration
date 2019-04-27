@@ -177,6 +177,7 @@
             // btnCancelAdd
             // 
             this.btnCancelAdd.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(43)))), ((int)(((byte)(43)))), ((int)(((byte)(43)))));
+            this.btnCancelAdd.DialogResult = System.Windows.Forms.DialogResult.Cancel;
             this.btnCancelAdd.FlatAppearance.BorderSize = 0;
             this.btnCancelAdd.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.btnCancelAdd.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(239)))), ((int)(((byte)(239)))), ((int)(((byte)(239)))));
@@ -208,8 +209,10 @@
             // 
             // AddUser
             // 
+            this.AcceptButton = this.btnAddUser;
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
+            this.CancelButton = this.btnCancelAdd;
             this.ClientSize = new System.Drawing.Size(319, 344);
             this.Controls.Add(this.txtInitialPass);
             this.Controls.Add(this.lblPassword);
@@ -254,7 +257,6 @@
         private System.Windows.Forms.Label lblEmail;
         private System.Windows.Forms.Label lblUserName;
         private System.Windows.Forms.Button btnAddUser;
-        private System.Windows.Forms.Button btnCancel;
         private System.Windows.Forms.Label lblUserInfo;
         private System.Windows.Forms.Button btnCancelAdd;
         private System.Windows.Forms.Label lblPassword;

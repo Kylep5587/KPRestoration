@@ -1,6 +1,7 @@
 ﻿using MySql.Data.MySqlClient;
 using System;
 using System.Collections.Generic;
+using System.Data;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -11,6 +12,7 @@ namespace KPRestoration
     public class User
     {
         DatabaseHelper db = new DatabaseHelper();
+        private string defaultDGVQuery = "SELECT userID, username, firstName, lastName, email, phone, rank, userStatus FROM Users ORDER BY lastName";
 
         // Members
         private int id;
@@ -128,7 +130,6 @@ namespace KPRestoration
                     user = dr["username"].ToString();
 
                 db.CloseConnection();
-
                 if (user == username)
                     return true;
                 else
@@ -163,19 +164,33 @@ namespace KPRestoration
          * *******************************/
         public bool EmailExists(string email)
         {
+            string emailAddress = "";
             string query = "SELECT email FROM Users WHERE username = @email LIMIT 1";
             MySqlCommand cmd = new MySqlCommand(query, db.conn);
-            cmd.Parameters.AddWithValue("@username", username);
-            bool emailExists = db.ExecuteCommand(cmd);
-            return emailExists;
+            cmd.Parameters.AddWithValue("@email", email);
+
+            if (db.ExecuteCommand(cmd))
+            {
+                db.OpenConnection();
+                MySqlDataReader dr = cmd.ExecuteReader();
+                if (dr.Read())
+                    emailAddress = dr["email"].ToString();
+
+                db.CloseConnection();
+                if (emailAddress == email)
+                    return true;
+                else
+                    return false;
+            }
+            return false;
         }
 
 
         /* Populate user DGV headers and rows
          * *****************************/
-        public void PopulateUserDGV(DataGridView DGV, string query)
+        public void PopulateDGV(DataGridView DGV)
         {
-            if (db.PopulateDGV(DGV, query))
+            if (db.PopulateDGV(DGV, defaultDGVQuery))
             {
                 DGV.Columns[0].HeaderText = "ID";
                 DGV.Columns[1].HeaderText = "Username";
@@ -195,10 +210,23 @@ namespace KPRestoration
 
         /* Populates access level dropdown with ranks up to the current user's rank
          * *****************************/
-        public void PopulateRanks(ComboBox cb)
+        public void PopulateUserRanks(ComboBox cb)
         {
             for (int i = 1; i <= this.Rank; i++)
                 cb.Items.Add(i);
+        }
+
+
+        /* Populates dgvUsers with search results
+         *      Called when user types in search box or clicks search
+         * *****************************/
+        public void Search(DataGridView DGV, string searchQuery)
+        {
+            searchQuery = "%" + searchQuery + "%";                              // Add wildcards to the search query
+            MySqlCommand cmd = new MySqlCommand("SEARCH_USERS", db.conn);
+            cmd.CommandType = CommandType.StoredProcedure;                               // Name of the stored procedure
+            cmd.Parameters.AddWithValue("@searchQuery", searchQuery.Trim());
+            db.PopulateDGV(DGV, cmd);
         }
     }
 }

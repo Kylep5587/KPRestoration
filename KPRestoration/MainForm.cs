@@ -25,9 +25,11 @@ namespace KPRestoration
 
         private void btnUsers_Click(object sender, EventArgs e)
         {
-            ManageUsers userForm = new ManageUsers(currentUser);
-            userForm.TopLevel = false;
-            userForm.AutoScroll = true;
+            ManageUsers userForm = new ManageUsers(currentUser)
+            {
+                MdiParent = this,
+                Dock = DockStyle.Fill
+            };
             panelContent.Controls.Add(userForm);
             userForm.Show();
             this.Text = "Manage Users";
@@ -42,9 +44,11 @@ namespace KPRestoration
 
         private void btnVehicleManager_Click(object sender, EventArgs e)
         {
-            VehicleManager vehicleForm = new VehicleManager(currentUser);
-            vehicleForm.TopLevel = false;
-            vehicleForm.AutoScroll = true;
+            VehicleManager vehicleForm = new VehicleManager(currentUser)
+            {
+                MdiParent = this,
+                Dock = DockStyle.Fill
+            };
             panelContent.Controls.Add(vehicleForm);
             vehicleForm.Show();
             this.Text = "Vehicle Manager";

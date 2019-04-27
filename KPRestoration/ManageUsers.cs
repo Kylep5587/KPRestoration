@@ -14,11 +14,12 @@ namespace KPRestoration
 {
     public partial class ManageUsers : Form
     {
-        private User currentUser = new User();
+        private User currentUser;
+        private Buyer buyer = new Buyer();
+        private Buyer selectedBuyer = new Buyer();
         private DatabaseHelper db = new DatabaseHelper();
         private string query = null;
-        private int selectedID;
-        private string defaultDGVQuery = "SELECT userID, username, firstName, lastName, email, phone, rank, userStatus FROM Users ORDER BY lastName";
+        private int selectedUserID;
 
 
         /* Constructor with userInfo parameter
@@ -26,27 +27,20 @@ namespace KPRestoration
         public ManageUsers(User userInfo)
         {
             InitializeComponent();
-            currentUser = userInfo; 
-            currentUser.PopulateRanks(cbRank);
-            currentUser.PopulateUserDGV(dgvUsers, defaultDGVQuery);
+            currentUser = userInfo;
+            Globals.PopulateStateList(cbBuyerState);
+            currentUser.PopulateUserRanks(cbRank);
+            currentUser.PopulateDGV(dgvUsers);
         }
 
 
-        /* Empty Constructor used by AddUser.cs
+        /* Called when Add User window closes
          * *****************************/
-        public ManageUsers()
+        public void RefreshUserDGV()
         {
-
+            currentUser.PopulateDGV(dgvUsers);
         }
-
-
-        /* Handles "Add User" menu option
-         * *****************************/
-        public void RefreshDGV()
-        {
-            currentUser.PopulateUserDGV(dgvUsers, "SELECT userID, username, firstName, lastName, email, phone, rank, userStatus FROM Users ORDER BY lastName");
-        }
-
+        
 
         /* Handles "Add User" menu option
          * *****************************/
@@ -73,8 +67,8 @@ namespace KPRestoration
             btnDeleteUser.Enabled = false;
             lblCurrentUser.Visible = false;
 
-            userSearch.Select(); // Place cursor in search field
-            currentUser.PopulateUserDGV(dgvUsers, defaultDGVQuery);
+            txtUserSearch.Select(); // Place cursor in search field
+            currentUser.PopulateDGV(dgvUsers);
         }
 
 
@@ -148,7 +142,7 @@ namespace KPRestoration
             else // Execute query if inpout is valid
             {
                 // Prevent user from modifying rank or access level of themselves
-                if (selectedID == currentUser.Id && (username.Text != currentUser.Username || Convert.ToInt32(cbRank.Text.ToString()) != currentUser.Rank || cbUserStatus.Text != currentUser.Status))
+                if (selectedUserID == currentUser.Id && (username.Text != currentUser.Username || Convert.ToInt32(cbRank.Text.ToString()) != currentUser.Rank || cbUserStatus.Text != currentUser.Status))
                 {
                     MessageBox.Show("You cannot modify the rank or status of the account you are currently logged in on. To modify these values for this user, please login from a different account.", "Edit Restricted", MessageBoxButtons.OK, MessageBoxIcon.Warning);
                 }
@@ -163,14 +157,14 @@ namespace KPRestoration
                     cmd.Parameters.AddWithValue("@phone", phoneNumber);
                     cmd.Parameters.AddWithValue("@rank", Convert.ToInt32(cbRank.Text.ToString()));
                     cmd.Parameters.AddWithValue("@userStatus", cbUserStatus.Text.ToString());
-                    cmd.Parameters.AddWithValue("@selectedID", selectedID);
+                    cmd.Parameters.AddWithValue("@selectedID", selectedUserID);
 
                     if (db.ExecuteCommand(cmd))
                     {
                         MessageBox.Show("User information updated.", "Update Successful", MessageBoxButtons.OK, MessageBoxIcon.Information);
                         ResetFields();
                         DisableFields();
-                        currentUser.PopulateUserDGV(dgvUsers, defaultDGVQuery);
+                        currentUser.PopulateDGV(dgvUsers);
                     }
                     else
                     {
@@ -192,7 +186,7 @@ namespace KPRestoration
             int index = e.RowIndex;
             DataGridViewRow selectedRow = dgvUsers.Rows[index];
 
-            selectedID = Convert.ToInt32(selectedRow.Cells[0].Value);
+            selectedUserID = Convert.ToInt32(selectedRow.Cells[0].Value);
             username.Text = selectedRow.Cells[1].Value.ToString();
             firstName.Text = selectedRow.Cells[2].Value.ToString();
             lastName.Text = selectedRow.Cells[3].Value.ToString();
@@ -221,7 +215,7 @@ namespace KPRestoration
         {
             string deleteUsername = username.Text;
 
-            if (selectedID == currentUser.Id || deleteUsername == currentUser.Username) // Prevent deletion of current user
+            if (selectedUserID == currentUser.Id || deleteUsername == currentUser.Username) // Prevent deletion of current user
             {
                 MessageBox.Show("You cannot delete the current user. To delete this user, login from another account and try again.", "Delete Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
@@ -235,12 +229,12 @@ namespace KPRestoration
                         MessageBox.Show("Please select a user to delete.", "No User Selected", MessageBoxButtons.OK, MessageBoxIcon.Warning);
                     else
                     {
-                        query = "DELETE FROM Users WHERE username = '" + deleteUsername + "' AND userID = " + selectedID;
+                        query = "DELETE FROM Users WHERE username = '" + deleteUsername + "' AND userID = " + selectedUserID;
 
                         try
                         {
                             db.Delete(query);
-                            currentUser.PopulateUserDGV(dgvUsers, defaultDGVQuery);
+                            currentUser.PopulateDGV(dgvUsers);
                         }
                         catch
                         {
@@ -248,35 +242,140 @@ namespace KPRestoration
                         }
                     }
                 }
-                else
-                {
-                    // Do nothing
-                }
             }
-            
         }
 
 
-        /* Populates dgvUsers with search results
-         *      Called when user types in search box or clicks search
-         * *****************************/
-        private void SearchUsers()
-        {
-            query = "SELECT userID, username, firstName, lastName, email, phone, rank, userStatus FROM Users WHERE (username LIKE '%" + userSearch.Text.ToString() + "%') OR (email LIKE '%"+ userSearch.Text.ToString() + "%') OR (CONCAT(firstName, ' ', lastName) LIKE '%" + userSearch.Text.ToString() + "%') ORDER BY username";
-            currentUser.PopulateUserDGV(dgvUsers, query);
-        }
-
-
+        /* Executes search
+        * **************************************/
         private void btnSearchUsers_Click(object sender, EventArgs e)
         {
-            SearchUsers();
+            currentUser.Search(dgvUsers, txtUserSearch.Text);
         }
 
 
-        private void userSearch_TextChanged(object sender, EventArgs e)
+        /* Executes database query when user starts typing in search field
+        * **************************************/
+        private void txtUserSearch_TextChanged(object sender, EventArgs e)
         {
-            SearchUsers();
+            currentUser.Search(dgvUsers, txtUserSearch.Text);
         }
+
+        /* ==============================================================
+         ======================= Buyer Related Code =====================
+         ================================================================*/
+
         
+        /* Opens Add Buyer window
+        * **************************************/
+        private void addBuyerToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            AddBuyer addBuyerForm = new AddBuyer(currentUser, this);
+            addBuyerForm.Show();
+        }
+
+
+        /* Called when Add Buyer window closes
+         * *****************************/
+        public void RefreshBuyerDGV()
+        {
+            buyer.PopulateDGV(dgvBuyers);
+        }
+
+
+        /* Populates buyer information fields when DGV row selected
+        * **************************************/
+        private void dgvBuyers_CellClick(object sender, DataGridViewCellEventArgs e)
+        {
+            btnDeleteBuyer.Enabled = true;
+
+            int index = e.RowIndex;
+            DataGridViewRow selectedRow = dgvBuyers.Rows[index];
+
+            string[] buyerNameArray = selectedRow.Cells[1].Value.ToString().Split(' ');     // Breaks last name and first name apart
+
+            // Sets address fields if address provided
+            if (selectedRow.Cells[4].Value.ToString() != "")
+            {
+                string[] buyerAddressArray = selectedRow.Cells[4].Value.ToString().Split(' '); // Breaks address into address, city, state, and zip
+                txtBuyerAddress.Text = buyerAddressArray[0];
+                txtBuyerCity.Text = buyerAddressArray[1];
+                cbBuyerState.SelectedItem = buyerAddressArray[2];
+                txtBuyerZip.Text = buyerAddressArray[3];
+            }
+            cbBuyerStatus.SelectedItem = selectedRow.Cells[5].Value.ToString();
+
+            // Set selected buyer info
+            selectedBuyer.Id = Convert.ToInt32(selectedRow.Cells[0].Value);
+            selectedBuyer.FirstName = buyerNameArray[0];
+            selectedBuyer.LastName = buyerNameArray[1];
+            selectedBuyer.BuyerStatus = selectedRow.Cells[5].Value.ToString();
+            if (selectedRow.Cells[4].Value.ToString() != "")
+            {
+                string[] buyerAddressArray = selectedRow.Cells[4].Value.ToString().Split(' '); // Breaks address into address, city, state, and zip
+                selectedBuyer.Address = buyerAddressArray[0];
+                selectedBuyer.City = buyerAddressArray[1];
+                selectedBuyer.State = buyerAddressArray[2];
+                selectedBuyer.Zip = Convert.ToInt32(buyerAddressArray[3]);
+            }
+            else
+            {
+                selectedBuyer.Address = "";
+                selectedBuyer.City = "";
+                selectedBuyer.State = "";
+                selectedBuyer.Zip = null;
+            }
+
+            // Populate text fields
+            txtFirstName.Text = selectedBuyer.FirstName;
+            txtLastName.Text = selectedBuyer.LastName;
+            txtBuyerEmail.Text = selectedBuyer.Email;
+            txtBuyerPhone.Text = selectedBuyer.Phone;
+            txtBuyerAddress.Text = selectedBuyer.Address;
+            txtBuyerCity.Text = selectedBuyer.City;
+            cbBuyerState.SelectedItem = selectedBuyer.State;
+            txtBuyerZip.Text = selectedBuyer.Zip.ToString();
+        }
+
+
+        /* Deletes selected buyer
+        * **************************************/
+        private void btnDeleteBuyer_Click(object sender, EventArgs e)
+        {
+            string buyerName = selectedBuyer.FirstName + " " + selectedBuyer.LastName;
+            DialogResult = MessageBox.Show("Are you sure you want to delete the buyer: \"" + buyerName + "\"?", "Confirm", MessageBoxButtons.YesNo, MessageBoxIcon.Warning);
+
+            if (DialogResult == DialogResult.Yes) // User confirmed delete
+            {
+                if (buyerName == " ") // No user selected
+                    MessageBox.Show("Please select a buyer to delete.", "No buyer Selected", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                else
+                    selectedBuyer.Delete();
+            }
+        }
+
+
+        /* Populates dgvBuyers when "Buyer" tab clicked
+        * **************************************/
+        private void usersTabControl_Click(object sender, EventArgs e)
+        {
+            buyer.PopulateDGV(dgvBuyers);
+        }
+
+
+        /* Executes search as user types in search field
+        * **************************************/
+        private void txtBuyerSearch_TextChanged(object sender, EventArgs e)
+        {
+            buyer.Search(dgvBuyers, txtBuyerSearch.Text);
+        }
+
+
+        /* Executes search when user clicks "Search" button
+        * **************************************/
+        private void btnSearchBuyer_Click(object sender, EventArgs e)
+        {
+            buyer.Search(dgvBuyers, txtBuyerSearch.Text);
+        }
     }
 }

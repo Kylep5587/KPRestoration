@@ -14,6 +14,7 @@ using System.Net.NetworkInformation;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
+using System.Windows.Forms;
 
 namespace KPRestoration
 {
@@ -26,6 +27,15 @@ namespace KPRestoration
         public static int adminLevel = 3;
         public const string dbHost = "rmserver";
         public static Color errorColor = Color.FromArgb(197, 0, 0);
+        private static string[] stateList = { "AK", "AL", "AR", "AZ", "CA", "CO", "CT", "DC", "DE", "FL", "GA", "GU", "HI", "IA", "ID", "IL", "IN", "KS", "KY", "LA", "MA", "MD", "ME", "MH", "MI", "MN", "MO", "MS", "MT", "NC", "ND", "NE", "NH", "NJ", "NM", "NV", "NY", "OH", "OK", "OR", "PA", "PR", "PW", "RI", "SC", "SD", "TN", "TX", "UT", "VA", "VI", "VT", "WA", "WI", "WV", "WY" };
+
+
+        /*  Used to populate a ComboBox with state abbreviations
+         *  **************************************/
+        public static void PopulateStateList(ComboBox stateBox)
+        {
+            stateBox.Items.AddRange(stateList);
+        }
 
 
         /*  Encryption function using SHA1 
@@ -119,6 +129,19 @@ namespace KPRestoration
             if (numeric.IsMatch(value) || currency.IsMatch(value))
                 validInput = true;
    
+            return validInput;
+        }
+
+
+        /*  Checks for numeric only input
+         *  **************************************/
+        public static bool IsNumeric(string s)
+        {
+            bool validInput = false;
+            Regex numeric = new Regex(@"^[0-9]");
+            if (numeric.IsMatch(s))
+                validInput = true;
+
             return validInput;
         }
 

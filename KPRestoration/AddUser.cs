@@ -27,20 +27,10 @@ namespace KPRestoration
         {
             InitializeComponent();
             owner = formOwner;  // Set the owner of this form 
-            this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.AddUser_FormClosing); // Calls the FormClosing method upon form closure
+            
             currentUser = userInfo;
-            PopulateRanks(cbRank);
+            currentUser.PopulateUserRanks(cbRank);
             cbRank.SelectedIndex = 0;
-        }
-
-
-        /* Populates access level dropdown with ranks 
-         *  up to the current user's rank
-         * *****************************/
-        private void PopulateRanks(ComboBox cb)
-        {
-            for (int i = 1; i <= currentUser.Rank; i++)
-                cb.Items.Add(i);
         }
 
 
@@ -123,7 +113,7 @@ namespace KPRestoration
             // Ensure email isn't already present
             if (isValidEmail)
             {
-                if (newUser.EmailExists(newUser.Email)) 
+                if (newUser.EmailExists(newUser.Email))
                 {
                     dataConflict = true;
                     errors += "\u2022 Email address already registered\n";
@@ -135,8 +125,8 @@ namespace KPRestoration
             {
                 // Insert data into Users, Buyers, and TitleHolders tables - a buyer and title holder is created when a user is created
                 bool userCreated = newUser.AddUser();
-                bool buyerCreated = newBuyer.AddBuyer(newUser.FirstName, newUser.LastName, newUser.Phone, newUser.Email, newUser.Status);    
-                bool holderCreated = newHolder.AddTitleHolder(newUser.FirstName, newUser.LastName, newUser.Phone, newUser.Email, newUser.Status);
+                bool buyerCreated = newBuyer.Add(newUser.FirstName, newUser.LastName, newUser.Phone, newUser.Email, newUser.Status);    
+                bool holderCreated = newHolder.Add(newUser.FirstName, newUser.LastName, newUser.Phone, newUser.Email, newUser.Status);
 
                 if (userCreated && buyerCreated && holderCreated)
                 {
@@ -157,7 +147,7 @@ namespace KPRestoration
         * *****************************************/
         private void AddUser_FormClosing(object sender, FormClosingEventArgs e)
         {
-            owner.RefreshDGV();
+            owner.RefreshUserDGV();
         }
     }
 }

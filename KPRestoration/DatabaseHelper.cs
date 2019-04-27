@@ -115,12 +115,49 @@ namespace KPRestoration
             }
         }
 
+
+        /*  Populate targeted DGV with SQL Query results
+         *  **************************************/
+        public bool PopulateDGV(DataGridView dgv, MySqlCommand cmd)
+        {
+            try
+            {
+                if (OpenConnection() == true)
+                {
+                    // Store database data in dataAdapter
+                    MySqlDataAdapter da = new MySqlDataAdapter(cmd);
+                    // Store data from adapter in DataTable
+                    DataTable dt = new DataTable();
+                    //dt.Load(cmd.ExecuteReader());
+                    da.Fill(dt);
+
+                    // Move data to BindingSource
+                    //BindingSource bSource = new BindingSource();
+                    //bSource.DataSource = dt;
+
+                    // Dislay in DGV
+                    dgv.DataSource = dt;
+
+                    CloseConnection();
+                    return true;
+                }
+                else
+                    return false;
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("Error populating data grid view: " + ex.Message);
+                CloseConnection();
+                return false;
+            }
+        }
+
         /*  Insert data
          *  **************************************/
         public bool Insert(string query)
         {
             //open connection
-            if (this.OpenConnection() == true)
+            if (this.OpenConnection())
             {
                 try
                 {
@@ -155,7 +192,7 @@ namespace KPRestoration
                     CloseConnection();
                     return true;
                 }
-                catch (Exception ex)
+                catch (Exception)
                 {
                     CloseConnection();
                     return false;

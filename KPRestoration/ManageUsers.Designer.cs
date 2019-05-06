@@ -81,7 +81,7 @@
             this.btnSearchBuyer = new System.Windows.Forms.Button();
             this.txtBuyerSearch = new System.Windows.Forms.TextBox();
             this.lblBuyerInfo = new System.Windows.Forms.Label();
-            this.button2 = new System.Windows.Forms.Button();
+            this.btnSaveBuyerEdit = new System.Windows.Forms.Button();
             this.menuStrip1 = new System.Windows.Forms.MenuStrip();
             this.addBuyerToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.sellerTab = new System.Windows.Forms.TabPage();
@@ -193,7 +193,7 @@
             this.btnDeleteUser.FlatAppearance.BorderSize = 0;
             this.btnDeleteUser.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.btnDeleteUser.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(239)))), ((int)(((byte)(239)))), ((int)(((byte)(239)))));
-            this.btnDeleteUser.Location = new System.Drawing.Point(914, 453);
+            this.btnDeleteUser.Location = new System.Drawing.Point(1065, 453);
             this.btnDeleteUser.Name = "btnDeleteUser";
             this.btnDeleteUser.Size = new System.Drawing.Size(119, 23);
             this.btnDeleteUser.TabIndex = 21;
@@ -213,7 +213,7 @@
             this.dgvUsers.AutoSizeColumnsMode = System.Windows.Forms.DataGridViewAutoSizeColumnsMode.Fill;
             this.dgvUsers.BorderStyle = System.Windows.Forms.BorderStyle.None;
             this.dgvUsers.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
-            this.dgvUsers.Location = new System.Drawing.Point(329, 63);
+            this.dgvUsers.Location = new System.Drawing.Point(299, 63);
             this.dgvUsers.MinimumSize = new System.Drawing.Size(704, 379);
             this.dgvUsers.MultiSelect = false;
             this.dgvUsers.Name = "dgvUsers";
@@ -222,7 +222,7 @@
             this.dgvUsers.RowHeadersVisible = false;
             this.dgvUsers.RowTemplate.Resizable = System.Windows.Forms.DataGridViewTriState.False;
             this.dgvUsers.SelectionMode = System.Windows.Forms.DataGridViewSelectionMode.FullRowSelect;
-            this.dgvUsers.Size = new System.Drawing.Size(857, 379);
+            this.dgvUsers.Size = new System.Drawing.Size(885, 379);
             this.dgvUsers.TabIndex = 1;
             this.dgvUsers.CellClick += new System.Windows.Forms.DataGridViewCellEventHandler(this.dgvUsers_CellClick);
             // 
@@ -242,7 +242,7 @@
             // 
             this.lblUsers.AutoSize = true;
             this.lblUsers.Font = new System.Drawing.Font("Tahoma", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.lblUsers.Location = new System.Drawing.Point(732, 27);
+            this.lblUsers.Location = new System.Drawing.Point(702, 27);
             this.lblUsers.Name = "lblUsers";
             this.lblUsers.Size = new System.Drawing.Size(54, 19);
             this.lblUsers.TabIndex = 3;
@@ -272,7 +272,7 @@
             this.btnSearchUsers.FlatAppearance.BorderSize = 0;
             this.btnSearchUsers.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.btnSearchUsers.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(239)))), ((int)(((byte)(239)))), ((int)(((byte)(239)))));
-            this.btnSearchUsers.Location = new System.Drawing.Point(546, 452);
+            this.btnSearchUsers.Location = new System.Drawing.Point(516, 452);
             this.btnSearchUsers.Name = "btnSearchUsers";
             this.btnSearchUsers.Size = new System.Drawing.Size(75, 23);
             this.btnSearchUsers.TabIndex = 11;
@@ -292,7 +292,7 @@
             // txtUserSearch
             // 
             this.txtUserSearch.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
-            this.txtUserSearch.Location = new System.Drawing.Point(329, 453);
+            this.txtUserSearch.Location = new System.Drawing.Point(299, 453);
             this.txtUserSearch.Name = "txtUserSearch";
             this.txtUserSearch.Size = new System.Drawing.Size(200, 21);
             this.txtUserSearch.TabIndex = 10;
@@ -457,7 +457,7 @@
             this.buyerTab.Controls.Add(this.btnSearchBuyer);
             this.buyerTab.Controls.Add(this.txtBuyerSearch);
             this.buyerTab.Controls.Add(this.lblBuyerInfo);
-            this.buyerTab.Controls.Add(this.button2);
+            this.buyerTab.Controls.Add(this.btnSaveBuyerEdit);
             this.buyerTab.Controls.Add(this.menuStrip1);
             this.buyerTab.Location = new System.Drawing.Point(4, 22);
             this.buyerTab.Name = "buyerTab";
@@ -629,7 +629,7 @@
             this.btnDeleteBuyer.FlatAppearance.BorderSize = 0;
             this.btnDeleteBuyer.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.btnDeleteBuyer.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(239)))), ((int)(((byte)(239)))), ((int)(((byte)(239)))));
-            this.btnDeleteBuyer.Location = new System.Drawing.Point(1042, 453);
+            this.btnDeleteBuyer.Location = new System.Drawing.Point(1050, 453);
             this.btnDeleteBuyer.Name = "btnDeleteBuyer";
             this.btnDeleteBuyer.Size = new System.Drawing.Size(136, 23);
             this.btnDeleteBuyer.TabIndex = 47;
@@ -649,7 +649,7 @@
             this.dgvBuyers.AutoSizeColumnsMode = System.Windows.Forms.DataGridViewAutoSizeColumnsMode.Fill;
             this.dgvBuyers.BorderStyle = System.Windows.Forms.BorderStyle.None;
             this.dgvBuyers.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
-            this.dgvBuyers.Location = new System.Drawing.Point(321, 63);
+            this.dgvBuyers.Location = new System.Drawing.Point(291, 63);
             this.dgvBuyers.MinimumSize = new System.Drawing.Size(704, 379);
             this.dgvBuyers.MultiSelect = false;
             this.dgvBuyers.Name = "dgvBuyers";
@@ -658,7 +658,7 @@
             this.dgvBuyers.RowHeadersVisible = false;
             this.dgvBuyers.RowTemplate.Resizable = System.Windows.Forms.DataGridViewTriState.False;
             this.dgvBuyers.SelectionMode = System.Windows.Forms.DataGridViewSelectionMode.FullRowSelect;
-            this.dgvBuyers.Size = new System.Drawing.Size(857, 379);
+            this.dgvBuyers.Size = new System.Drawing.Size(895, 379);
             this.dgvBuyers.TabIndex = 43;
             this.dgvBuyers.CellClick += new System.Windows.Forms.DataGridViewCellEventHandler(this.dgvBuyers_CellClick);
             // 
@@ -666,7 +666,7 @@
             // 
             this.lblBuyers.AutoSize = true;
             this.lblBuyers.Font = new System.Drawing.Font("Tahoma", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.lblBuyers.Location = new System.Drawing.Point(728, 27);
+            this.lblBuyers.Location = new System.Drawing.Point(698, 27);
             this.lblBuyers.Name = "lblBuyers";
             this.lblBuyers.Size = new System.Drawing.Size(64, 19);
             this.lblBuyers.TabIndex = 44;
@@ -679,7 +679,7 @@
             this.btnSearchBuyer.FlatAppearance.BorderSize = 0;
             this.btnSearchBuyer.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.btnSearchBuyer.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(239)))), ((int)(((byte)(239)))), ((int)(((byte)(239)))));
-            this.btnSearchBuyer.Location = new System.Drawing.Point(538, 452);
+            this.btnSearchBuyer.Location = new System.Drawing.Point(508, 452);
             this.btnSearchBuyer.Name = "btnSearchBuyer";
             this.btnSearchBuyer.Size = new System.Drawing.Size(75, 23);
             this.btnSearchBuyer.TabIndex = 46;
@@ -690,7 +690,7 @@
             // txtBuyerSearch
             // 
             this.txtBuyerSearch.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
-            this.txtBuyerSearch.Location = new System.Drawing.Point(321, 453);
+            this.txtBuyerSearch.Location = new System.Drawing.Point(291, 453);
             this.txtBuyerSearch.Name = "txtBuyerSearch";
             this.txtBuyerSearch.Size = new System.Drawing.Size(200, 21);
             this.txtBuyerSearch.TabIndex = 45;
@@ -706,19 +706,20 @@
             this.lblBuyerInfo.TabIndex = 24;
             this.lblBuyerInfo.Text = "Buyer Information";
             // 
-            // button2
+            // btnSaveBuyerEdit
             // 
-            this.button2.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(43)))), ((int)(((byte)(43)))), ((int)(((byte)(43)))));
-            this.button2.Enabled = false;
-            this.button2.FlatAppearance.BorderSize = 0;
-            this.button2.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-            this.button2.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(239)))), ((int)(((byte)(239)))), ((int)(((byte)(239)))));
-            this.button2.Location = new System.Drawing.Point(89, 363);
-            this.button2.Name = "button2";
-            this.button2.Size = new System.Drawing.Size(75, 23);
-            this.button2.TabIndex = 37;
-            this.button2.Text = "Save";
-            this.button2.UseVisualStyleBackColor = false;
+            this.btnSaveBuyerEdit.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(43)))), ((int)(((byte)(43)))), ((int)(((byte)(43)))));
+            this.btnSaveBuyerEdit.Enabled = false;
+            this.btnSaveBuyerEdit.FlatAppearance.BorderSize = 0;
+            this.btnSaveBuyerEdit.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.btnSaveBuyerEdit.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(239)))), ((int)(((byte)(239)))), ((int)(((byte)(239)))));
+            this.btnSaveBuyerEdit.Location = new System.Drawing.Point(89, 363);
+            this.btnSaveBuyerEdit.Name = "btnSaveBuyerEdit";
+            this.btnSaveBuyerEdit.Size = new System.Drawing.Size(75, 23);
+            this.btnSaveBuyerEdit.TabIndex = 37;
+            this.btnSaveBuyerEdit.Text = "Save";
+            this.btnSaveBuyerEdit.UseVisualStyleBackColor = false;
+            this.btnSaveBuyerEdit.Click += new System.EventHandler(this.btnSaveBuyerEdit_Click);
             // 
             // menuStrip1
             // 
@@ -744,7 +745,7 @@
             this.sellerTab.Location = new System.Drawing.Point(4, 22);
             this.sellerTab.Name = "sellerTab";
             this.sellerTab.Padding = new System.Windows.Forms.Padding(3);
-            this.sellerTab.Size = new System.Drawing.Size(1056, 534);
+            this.sellerTab.Size = new System.Drawing.Size(1192, 534);
             this.sellerTab.TabIndex = 2;
             this.sellerTab.Text = "Sellers";
             // 
@@ -829,7 +830,7 @@
         private System.Windows.Forms.TextBox email;
         private System.Windows.Forms.TextBox lastName;
         private System.Windows.Forms.Label lblBuyerInfo;
-        private System.Windows.Forms.Button button2;
+        private System.Windows.Forms.Button btnSaveBuyerEdit;
         private System.Windows.Forms.MenuStrip menuStrip1;
         private System.Windows.Forms.ToolStripMenuItem addBuyerToolStripMenuItem;
         private System.Windows.Forms.Button btnDeleteBuyer;

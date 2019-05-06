@@ -1,4 +1,12 @@
-﻿using System;
+﻿/*********************************************************
+ * KP Restoration VMS                                    *
+ * Created 4/12/19 by Kyle Price                         *
+ * AddBuyer.cs - used to add a buyer to the database     *
+ *  Opened from ManageUsers.cs                           *
+ * ******************************************************/
+
+using MySql.Data.MySqlClient;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
@@ -12,8 +20,10 @@ namespace KPRestoration
 {
     public partial class AddBuyer : Form
     {
+        DatabaseHelper db = new DatabaseHelper();
         User currentUser;
         ManageUsers owner;
+        Buyer tempBuyer = new Buyer();
 
         /* Constructor
          * ******************************/
@@ -41,99 +51,43 @@ namespace KPRestoration
          * ******************************/
         private void btnAddBuyer_Click(object sender, EventArgs e)
         {
-            bool inputError = false;
             bool dataConflict = false;
             string errorMessage = "Please fix the following input errors: \n\n";
-            string errors = "";
-            string phone = txtPhone.Text;
-            bool isValidEmail = false;
-
-            // Phone validation and formatting
-            if ((phone != "" && phone.Length >= 10) && Globals.IsPhoneNumber(phone))
-                phone = Globals.FormatPhoneNumber(phone);
-            else if (phone != "" && !Globals.IsPhoneNumber(phone))
-            {
-                errors += "\u2022 Invalid phone number\n";
-                inputError = true;
-            }
-            else if (phone == "")
-            {
-                errors += "\u2022 Phone number required\n";
-                inputError = true;
-            }
-
-            // Email validation
-            if (txtEmail.Text != "")
-                isValidEmail = Globals.IsEmail(txtEmail.Text);
-            else
-            {
-                errors += "\u2022 Email address required\n";
-                inputError = true;
-            }
-
-            if (txtEmail.Text != "" && !isValidEmail)
-            {
-                errors += "\u2022 Invalid email address\n";
-                inputError = true;
-            }
-
-            // Check if zip code the correct length
-            if (txtZip.Text.Length != 5 || !Globals.IsNumeric(txtZip.Text))
-            {
-                errors += "\u2022 Invalid zip code\n";
-                inputError = true;
-            }
+            string errors = tempBuyer.CheckData("Buyer", "New", txtPhone.Text, txtEmail.Text, txtFirstName.Text, txtLastName.Text, txtBuyerZip.Text); // Check for valid data
 
             // Create user if proper input detected
-            if (!inputError)
+            if (errors == null)
             {
+                string phone = Globals.FormatPhoneNumber(txtPhone.Text);
                 // Create buyer
                 Buyer newBuyer = new Buyer
                 {
-                    FirstName = txtFirstName.Text,
-                    LastName = txtLastName.Text,
-                    Email = txtEmail.Text,
-                    Phone = phone,
+                    FirstName = txtFirstName.Text.Trim(),
+                    LastName = txtLastName.Text.Trim(),
+                    Email = txtEmail.Text.Trim(),
+                    Phone = phone.Trim(),
                     Address = txtAddress.Text,
-                    City = txtCity.Text,
+                    City = txtCity.Text.Trim(),
                     State = cbState.SelectedItem.ToString(),
-                    Zip = Convert.ToInt32(txtZip.Text),
+                    Zip = Convert.ToInt32(txtBuyerZip.Text.Trim()),
                     BuyerStatus = cbStatus.SelectedItem.ToString()
                 };
-
-                // Check for email already registered
-                if (newBuyer.EmailExists(newBuyer.Email))
-                {
-                    dataConflict = true;
-                    errors += "\u2022 Email address already registered\n";
-                }
-
-                // Check if name is already used
-                if (newBuyer.NameExists())
-                {
-                    dataConflict = true;
-                    errors += "\u2022 Buyer name already exists\n";
-                }
+                
+                if (errors != null)
+                    dataConflict = true; // Set data conflict to true if CheckDataConflict returns an error string that is not null
 
                 // Insert buyer data
                 if (!dataConflict)
                 {
                     bool buyerAdded = newBuyer.Add(); // Attempt to insert buyer data
 
-                    if (!buyerAdded)
-                    {
-                        MessageBox.Show("Buyer added successfully!");
+                    if (buyerAdded)
                         this.Close();
-                    }
                     else
-                    {
                         MessageBox.Show("Error adding buyer!\n", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                    }
                 }
                 else
-                {
                     MessageBox.Show(errorMessage + errors, "Invalid Data", MessageBoxButtons.OK, MessageBoxIcon.Warning);
-                }
             }
             else
                 MessageBox.Show(errorMessage + errors, "Invalid Data", MessageBoxButtons.OK, MessageBoxIcon.Warning);

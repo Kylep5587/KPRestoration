@@ -47,20 +47,21 @@
             this.cbState = new System.Windows.Forms.ComboBox();
             this.cbStatus = new System.Windows.Forms.ComboBox();
             this.lblStatus = new System.Windows.Forms.Label();
-            this.textBox1 = new System.Windows.Forms.TextBox();
+            this.txtBuyerZip = new System.Windows.Forms.TextBox();
             this.txtZip = new System.Windows.Forms.Label();
             this.SuspendLayout();
             // 
             // btnCancelAdd
             // 
             this.btnCancelAdd.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(43)))), ((int)(((byte)(43)))), ((int)(((byte)(43)))));
+            this.btnCancelAdd.DialogResult = System.Windows.Forms.DialogResult.Cancel;
             this.btnCancelAdd.FlatAppearance.BorderSize = 0;
             this.btnCancelAdd.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.btnCancelAdd.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(239)))), ((int)(((byte)(239)))), ((int)(((byte)(239)))));
             this.btnCancelAdd.Location = new System.Drawing.Point(182, 361);
             this.btnCancelAdd.Name = "btnCancelAdd";
             this.btnCancelAdd.Size = new System.Drawing.Size(75, 23);
-            this.btnCancelAdd.TabIndex = 43;
+            this.btnCancelAdd.TabIndex = 11;
             this.btnCancelAdd.Text = "Cancel";
             this.btnCancelAdd.UseVisualStyleBackColor = false;
             this.btnCancelAdd.Click += new System.EventHandler(this.btnCancelAdd_Click);
@@ -84,7 +85,7 @@
             this.btnAddBuyer.Location = new System.Drawing.Point(61, 361);
             this.btnAddBuyer.Name = "btnAddBuyer";
             this.btnAddBuyer.Size = new System.Drawing.Size(75, 23);
-            this.btnAddBuyer.TabIndex = 41;
+            this.btnAddBuyer.TabIndex = 10;
             this.btnAddBuyer.Text = "Add Buyer";
             this.btnAddBuyer.UseVisualStyleBackColor = false;
             this.btnAddBuyer.Click += new System.EventHandler(this.btnAddBuyer_Click);
@@ -95,7 +96,7 @@
             this.txtPhone.Location = new System.Drawing.Point(125, 150);
             this.txtPhone.Name = "txtPhone";
             this.txtPhone.Size = new System.Drawing.Size(150, 21);
-            this.txtPhone.TabIndex = 33;
+            this.txtPhone.TabIndex = 4;
             // 
             // txtEmail
             // 
@@ -103,7 +104,7 @@
             this.txtEmail.Location = new System.Drawing.Point(125, 117);
             this.txtEmail.Name = "txtEmail";
             this.txtEmail.Size = new System.Drawing.Size(150, 21);
-            this.txtEmail.TabIndex = 32;
+            this.txtEmail.TabIndex = 3;
             // 
             // txtLastName
             // 
@@ -111,7 +112,7 @@
             this.txtLastName.Location = new System.Drawing.Point(125, 84);
             this.txtLastName.Name = "txtLastName";
             this.txtLastName.Size = new System.Drawing.Size(150, 21);
-            this.txtLastName.TabIndex = 31;
+            this.txtLastName.TabIndex = 2;
             // 
             // txtFirstName
             // 
@@ -119,7 +120,7 @@
             this.txtFirstName.Location = new System.Drawing.Point(125, 51);
             this.txtFirstName.Name = "txtFirstName";
             this.txtFirstName.Size = new System.Drawing.Size(150, 21);
-            this.txtFirstName.TabIndex = 30;
+            this.txtFirstName.TabIndex = 1;
             // 
             // lblAddress
             // 
@@ -172,7 +173,7 @@
             this.txtAddress.Location = new System.Drawing.Point(125, 185);
             this.txtAddress.Name = "txtAddress";
             this.txtAddress.Size = new System.Drawing.Size(150, 21);
-            this.txtAddress.TabIndex = 44;
+            this.txtAddress.TabIndex = 5;
             // 
             // txtCity
             // 
@@ -180,7 +181,7 @@
             this.txtCity.Location = new System.Drawing.Point(125, 219);
             this.txtCity.Name = "txtCity";
             this.txtCity.Size = new System.Drawing.Size(150, 21);
-            this.txtCity.TabIndex = 46;
+            this.txtCity.TabIndex = 6;
             // 
             // lblCity
             // 
@@ -206,7 +207,7 @@
             this.cbState.Location = new System.Drawing.Point(125, 252);
             this.cbState.Name = "cbState";
             this.cbState.Size = new System.Drawing.Size(150, 21);
-            this.cbState.TabIndex = 48;
+            this.cbState.TabIndex = 7;
             // 
             // cbStatus
             // 
@@ -217,7 +218,7 @@
             this.cbStatus.Location = new System.Drawing.Point(125, 316);
             this.cbStatus.Name = "cbStatus";
             this.cbStatus.Size = new System.Drawing.Size(150, 21);
-            this.cbStatus.TabIndex = 50;
+            this.cbStatus.TabIndex = 9;
             // 
             // lblStatus
             // 
@@ -228,13 +229,13 @@
             this.lblStatus.TabIndex = 49;
             this.lblStatus.Text = "Status:";
             // 
-            // textBox1
+            // txtBuyerZip
             // 
-            this.textBox1.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
-            this.textBox1.Location = new System.Drawing.Point(125, 285);
-            this.textBox1.Name = "textBox1";
-            this.textBox1.Size = new System.Drawing.Size(150, 21);
-            this.textBox1.TabIndex = 52;
+            this.txtBuyerZip.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
+            this.txtBuyerZip.Location = new System.Drawing.Point(125, 285);
+            this.txtBuyerZip.Name = "txtBuyerZip";
+            this.txtBuyerZip.Size = new System.Drawing.Size(150, 21);
+            this.txtBuyerZip.TabIndex = 8;
             // 
             // txtZip
             // 
@@ -252,7 +253,7 @@
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.CancelButton = this.btnCancelAdd;
             this.ClientSize = new System.Drawing.Size(319, 405);
-            this.Controls.Add(this.textBox1);
+            this.Controls.Add(this.txtBuyerZip);
             this.Controls.Add(this.txtZip);
             this.Controls.Add(this.cbStatus);
             this.Controls.Add(this.lblStatus);
@@ -305,7 +306,7 @@
         private System.Windows.Forms.ComboBox cbState;
         private System.Windows.Forms.ComboBox cbStatus;
         private System.Windows.Forms.Label lblStatus;
-        private System.Windows.Forms.TextBox textBox1;
+        private System.Windows.Forms.TextBox txtBuyerZip;
         private System.Windows.Forms.Label txtZip;
     }
 }

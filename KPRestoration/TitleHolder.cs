@@ -1,9 +1,12 @@
-﻿using MySql.Data.MySqlClient;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿/*********************************************************
+ * KP Restoration VMS                                    *
+ * Created 4/12/19 by Kyle Price                         *
+ * TitleHolder.cs - data and operations related to       *
+ *      title holders                                    *
+ *  Child class of Customer                              *
+ * ******************************************************/
+
+using MySql.Data.MySqlClient;
 using System.Windows.Forms;
 
 namespace KPRestoration
@@ -17,11 +20,13 @@ namespace KPRestoration
         private int fee;
         private string feeType;
         private string status;
+        string holderStatus;
 
         // Getters and setters
         public int Fee { get => fee; set => fee = value; }
         public string FeeType { get => feeType; set => feeType = value; }
         public string Status { get => status; set => status = value; }
+        public string HolderStatus { get => holderStatus; set => holderStatus = value; }
 
 
         /* Enters current User object data into database
@@ -62,7 +67,6 @@ namespace KPRestoration
          * *****************************************/
         public override bool Update()
         {
-            bool buyerUpdated = false;
             string query = "Update TitleHolder SET firstName = @fName, lastName = @lName, address = @address, city = @city, state = @state, zip = @zip, phone = @phone, email = @email, holderStatus = @status WHERE titleHolderID = @titleHolderID";
             MySqlCommand cmd = new MySqlCommand(query, db.conn);
             cmd.Parameters.AddWithValue("@fName", this.FirstName);
@@ -75,15 +79,25 @@ namespace KPRestoration
             cmd.Parameters.AddWithValue("@email", this.Email);
             cmd.Parameters.AddWithValue("@status", this.Status);
             cmd.Parameters.AddWithValue("@titleHolderID", this.Id);
-            return buyerUpdated = db.ExecuteCommand(cmd);
+
+            if (db.ExecuteCommand(cmd))
+            {
+                MessageBox.Show("Title holder information updated successfully!", "Update Complete", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                return true;
+            }
+            else
+            {
+                MessageBox.Show("Error updating title holder information!", "Update Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                return false;
+            }
         }
 
 
-        /* Delete buyer information
+        /* Delete title holder information
          * *****************************************/
         public override void Delete()
         {
-            string query = "DELETE * FROM TitleHolders WHERE buyerID = @titleHolderID";
+            string query = "DELETE FROM TitleHolders WHERE titleHolderID = @titleHolderID";
             MySqlCommand cmd = new MySqlCommand(query, db.conn);
             cmd.Parameters.AddWithValue("@titleHolderID", this.Id);
             try
@@ -102,28 +116,35 @@ namespace KPRestoration
         }
 
 
-        /* Checks if email present in database
-         * *******************************/
-        public override bool EmailExists(string email)
+        /* Delete buyer information - takes string and DGV parameters
+         * *****************************************/
+        public override void Delete(string name, DataGridView DGV)
         {
-            string query = "SELECT email FROM TitleHolders WHERE email = @email LIMIT 1";
-            MySqlCommand cmd = new MySqlCommand(query, db.conn);
-            cmd.Parameters.AddWithValue("@email", email);
-            bool emailExists = db.ExecuteCommand(cmd);
-            return emailExists;
-        }
-
-
-        /* Checks if name present in database
-         * *******************************/
-        public override bool NameExists()
-        {
-            string name = this.FirstName + " " + this.LastName;
-            string query = "SELECT titleHolderID FROM TitleHolders WHERE CONCAT(firstName, ' ', lastName) = @name LIMIT 1";
-            MySqlCommand cmd = new MySqlCommand(query, db.conn);
-            cmd.Parameters.AddWithValue("@name", name);
-            bool nameExists = db.ExecuteCommand(cmd);
-            return nameExists;
+            System.Windows.Forms.DialogResult DialogResult = MessageBox.Show("Are you sure you want to delete the buyer: \"" + name + "\"?", "Confirm", MessageBoxButtons.YesNo, MessageBoxIcon.Warning);
+            if (DialogResult == DialogResult.Yes) // User confirmed delete
+            {
+                if (name == " ") // No user selected
+                    MessageBox.Show("Please select a buyer to delete.", "No buyer Selected", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                else
+                {
+                    string query = "DELETE FROM TitleHolders WHERE titleHolderID = @titleHolderID";
+                    MySqlCommand cmd = new MySqlCommand(query, db.conn);
+                    cmd.Parameters.AddWithValue("@titleHolderID", Id);
+                    try
+                    {
+                        db.ExecuteCommand(cmd);
+                        MessageBox.Show("Title holder deleted successfully!", "Success", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                    }
+                    catch (MySqlException)
+                    {
+                        MessageBox.Show("The title holder is associated with a vehicle currently in the database. The vehicle entry must be deleted or title holder changed before deleting this buyer.", "Delete Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    }
+                    catch
+                    {
+                        MessageBox.Show("Error while attempting to delete the title holder!", "Delete Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    }
+                }
+            }
         }
 
 
@@ -152,8 +173,7 @@ namespace KPRestoration
          * *****************************/
         public override void Search(DataGridView DGV, string searchQuery)
         {
-            string query = "SELECT CONCAT(firstName, ' ', lastName) AS Name, email, CONCAT(address, ' ', city, ', ', state, ' ', zip) AS Address, phone, holderStatus, dateAdded FROM TitleHolders WHERE (buyerStatus LIKE '% @searchQuery %') OR (email LIKE '% + @searchQuery %') OR (CONCAT(firstName, ' ', lastName) LIKE '% @searchQuery %') ORDER BY Name";
-            db.PopulateDGV(DGV, query);
+            db.PopulateDGV(DGV, defaultDGVQuery);
             DGV.Columns[0].HeaderText = "Name";
             DGV.Columns[1].HeaderText = "Phone";
             DGV.Columns[2].HeaderText = "Email";

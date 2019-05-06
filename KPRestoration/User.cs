@@ -12,7 +12,7 @@ namespace KPRestoration
     public class User
     {
         DatabaseHelper db = new DatabaseHelper();
-        private string defaultDGVQuery = "SELECT userID, username, firstName, lastName, email, phone, rank, userStatus FROM Users ORDER BY lastName";
+        private string defaultDGVQuery = "SELECT userID, username, CONCAT(firstName, ' ', lastName) AS Name, email, phone, rank, userStatus FROM Users ORDER BY lastName";
 
         // Members
         private int id;
@@ -160,12 +160,61 @@ namespace KPRestoration
         }
 
 
+        /* Delete buyer information
+         * *****************************************/
+        public void Delete()
+        {
+            string query = "DELETE FROM Users WHERE userID = @userID";
+            MySqlCommand cmd = new MySqlCommand(query, db.conn);
+            cmd.Parameters.AddWithValue("@userID", Id);
+
+            try
+            {
+                db.ExecuteCommand(cmd);
+                MessageBox.Show("User deleted successfully!", "Success", MessageBoxButtons.OK, MessageBoxIcon.Information);
+            }
+            catch
+            {
+                MessageBox.Show("Error while attempting to delete the user!", "Delete Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+        }
+
+
+        /* Delete user information - takes string and DGV parameters
+         * *****************************************/
+        public void Delete(string name, DataGridView DGV)
+        {
+            System.Windows.Forms.DialogResult DialogResult = MessageBox.Show("Are you sure you want to delete the buyer: \"" + name + "\"?", "Confirm", MessageBoxButtons.YesNo, MessageBoxIcon.Warning);
+            if (DialogResult == DialogResult.Yes) // User confirmed delete
+            {
+                if (name == " ") // No user selected
+                    MessageBox.Show("Please select a user to delete.", "No buyer Selected", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                else
+                {
+                    string query = "DELETE FROM Users WHERE userID = @userID";
+                    MySqlCommand cmd = new MySqlCommand(query, db.conn);
+                    cmd.Parameters.AddWithValue("@userID", this.Id);
+
+                    try
+                    {
+                        db.ExecuteCommand(cmd);
+                        MessageBox.Show("User deleted successfully!", "Success", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                    }
+                    catch
+                    {
+                        MessageBox.Show("Error while attempting to delete the user!", "Delete Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    }
+                }
+            }
+        }
+
+
         /* Checks if email present in database
          * *******************************/
         public bool EmailExists(string email)
         {
             string emailAddress = "";
-            string query = "SELECT email FROM Users WHERE username = @email LIMIT 1";
+            string query = "SELECT email FROM Users WHERE email = @email LIMIT 1";
             MySqlCommand cmd = new MySqlCommand(query, db.conn);
             cmd.Parameters.AddWithValue("@email", email);
 
@@ -194,13 +243,12 @@ namespace KPRestoration
             {
                 DGV.Columns[0].HeaderText = "ID";
                 DGV.Columns[1].HeaderText = "Username";
-                DGV.Columns[2].HeaderText = "First";
-                DGV.Columns[3].HeaderText = "Last";
-                DGV.Columns[4].HeaderText = "Email Address";
-                DGV.Columns[5].HeaderText = "Phone";
-                DGV.Columns[6].HeaderText = "Rank";
-                DGV.Columns[7].HeaderText = "Status";
-                DGV.Columns[4].AutoSizeMode = DataGridViewAutoSizeColumnMode.AllCells;    // Fixed issue with email address not being fully displayed
+                DGV.Columns[2].HeaderText = "Name";
+                DGV.Columns[3].HeaderText = "Email Address";
+                DGV.Columns[4].HeaderText = "Phone";
+                DGV.Columns[5].HeaderText = "Rank";
+                DGV.Columns[6].HeaderText = "Status";
+                DGV.Columns[3].AutoSizeMode = DataGridViewAutoSizeColumnMode.AllCells;    // Fixed issue with email address not being fully displayed
             }
             else
                 MessageBox.Show("There are currently no users in the database.", "No Users Found", MessageBoxButtons.OK, MessageBoxIcon.Warning);

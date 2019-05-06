@@ -1,10 +1,13 @@
-﻿using MySql.Data.MySqlClient;
-using System;
-using System.Collections.Generic;
+﻿/*********************************************************
+ * KP Restoration VMS                                    *
+ * Created 4/12/19 by Kyle Price                         *
+ * PCustomer.cs - stores data related to buyers and      *
+ *  sellers.                                             *
+ *  Parent class of Buyer, Seller, & TitleHolder         *
+ * ******************************************************/
+
+using MySql.Data.MySqlClient;
 using System.Data;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Forms;
 
 namespace KPRestoration
@@ -13,7 +16,7 @@ namespace KPRestoration
     {
         DatabaseHelper db = new DatabaseHelper();
         private string buyerStatus;
-        private string defaultDGVQuery = "SELECT buyerID as ID, CONCAT(firstName, ' ', lastName) AS Name, email, phone, CONCAT(address, ' ', city, ', ', state, ' ', zip) AS Address, buyerStatus, dateAdded FROM Buyers ORDER BY Name";
+        private string defaultDGVQuery = "SELECT buyerID as ID, CONCAT(firstName, ' ', lastName) AS Name, email, phone, address, city, state, zip, buyerStatus, dateAdded FROM Buyers ORDER BY Name";
 
         public string BuyerStatus { get => buyerStatus; set => buyerStatus = value; }
 
@@ -22,11 +25,15 @@ namespace KPRestoration
         public override bool Add()
         {
             bool buyerCreated = false;
-            string query = "INSERT INTO Buyers (firstName, lastName, phone, email, buyerStatus) VALUES " +
-                "(@fName, @lName, @phone, @email, @status)";
+            string query = "INSERT INTO Buyers (firstName, lastName, address, city, state, zip, phone, email, buyerStatus) VALUES " +
+                "(@fName, @lName, @address, @city, @state, @zip, @phone, @email, @status)";
             MySqlCommand cmd = new MySqlCommand(query, db.conn);
             cmd.Parameters.AddWithValue("@fName", this.FirstName);
             cmd.Parameters.AddWithValue("@lName", this.LastName);
+            cmd.Parameters.AddWithValue("@address", this.Address);
+            cmd.Parameters.AddWithValue("@city", this.City);
+            cmd.Parameters.AddWithValue("@state", this.State);
+            cmd.Parameters.AddWithValue("@zip", this.Zip);
             cmd.Parameters.AddWithValue("@phone", this.Phone);
             cmd.Parameters.AddWithValue("@email", this.Email);
             cmd.Parameters.AddWithValue("@status", this.BuyerStatus);
@@ -55,7 +62,6 @@ namespace KPRestoration
          * *****************************************/
         public override bool Update()
         {
-            bool buyerUpdated = false;
             string query = "Update Buyers SET firstName = @fName, lastName = @lName, address = @address, city = @city, state = @state, zip = @zip, phone = @phone, email = @email, buyerStatus = @status WHERE buyerID = @buyerID";
             MySqlCommand cmd = new MySqlCommand(query, db.conn);
             cmd.Parameters.AddWithValue("@fName", this.FirstName);
@@ -68,7 +74,17 @@ namespace KPRestoration
             cmd.Parameters.AddWithValue("@email", this.Email);
             cmd.Parameters.AddWithValue("@status", this.BuyerStatus);
             cmd.Parameters.AddWithValue("@buyerID", this.Id);
-            return buyerUpdated = db.ExecuteCommand(cmd);
+
+            if (db.ExecuteCommand(cmd))
+            {
+                MessageBox.Show("Buyer information updated successfully!", "Update Complete", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                return true;
+            }
+            else
+            {
+                MessageBox.Show("Error updating buyer information!", "Update Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                return false;
+            }
         }
 
 
@@ -76,9 +92,9 @@ namespace KPRestoration
          * *****************************************/
         public override void Delete()
         {
-            string query = "DELETE * FROM Buyers WHERE buyerID = @buyerID";
+            string query = "DELETE FROM Buyers WHERE buyerID = @buyerID";
             MySqlCommand cmd = new MySqlCommand(query, db.conn);
-            cmd.Parameters.AddWithValue("@buyerID", this.Id);
+            cmd.Parameters.AddWithValue("@buyerID", Id);
 
             try
             {
@@ -96,28 +112,38 @@ namespace KPRestoration
         }
 
 
-        /* Checks if email present in database
-         * *******************************/
-        public override bool EmailExists(string email)
+        /* Delete buyer information - takes string and DGV parameters
+         * *****************************************/
+        public override void Delete(string name, DataGridView DGV)
         {
-            string query = "SELECT email FROM Buyers WHERE email = @email LIMIT 1";
-            MySqlCommand cmd = new MySqlCommand(query, db.conn);
-            cmd.Parameters.AddWithValue("@email", email);
-            bool emailExists = db.ExecuteCommand(cmd);
-            return emailExists;
-        }
+            System.Windows.Forms.DialogResult DialogResult = MessageBox.Show("Are you sure you want to delete the buyer: \"" + name + "\"?", "Confirm", MessageBoxButtons.YesNo, MessageBoxIcon.Warning);
+            if (DialogResult == DialogResult.Yes) // User confirmed delete
+            {
+                if (name == " ") // No user selected
+                    MessageBox.Show("Please select a buyer to delete.", "No buyer Selected", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                else
+                {
+                    string query = "DELETE FROM Buyers WHERE buyerID = @buyerID";
+                    MySqlCommand cmd = new MySqlCommand(query, db.conn);
+                    cmd.Parameters.AddWithValue("@buyerID", Id);
 
-
-        /* Checks if name present in database
-         * *******************************/
-        public override bool NameExists()
-        {
-            string name = this.FirstName + " " + this.LastName;
-            string query = "SELECT buyerID FROM Buyers WHERE CONCAT(firstName, ' ', lastName) = @name LIMIT 1";
-            MySqlCommand cmd = new MySqlCommand(query, db.conn);
-            cmd.Parameters.AddWithValue("@name", name);
-            bool nameExists = db.ExecuteCommand(cmd);
-            return nameExists;
+                    try
+                    {
+                        db.ExecuteCommand(cmd);
+                        MessageBox.Show("Buyer deleted successfully!", "Success", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                        PopulateDGV(DGV);
+                    }
+                    catch (MySqlException)
+                    {
+                        MessageBox.Show("The buyer is associated with a vehicle currently in the database. The vehicle entry must be deleted or buyer changed before deleting this buyer.", "Delete Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    }
+                    catch
+                    {
+                        MessageBox.Show("Error while attempting to delete the buyer!", "Delete Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    }
+                    
+                }
+            }
         }
 
 
@@ -132,9 +158,14 @@ namespace KPRestoration
                 DGV.Columns[2].HeaderText = "Email";
                 DGV.Columns[3].HeaderText = "Phone";
                 DGV.Columns[4].HeaderText = "Address";
-                DGV.Columns[5].HeaderText = "Status";
-                DGV.Columns[6].HeaderText = "Date Added";
+                DGV.Columns[5].HeaderText = "City";
+                DGV.Columns[6].HeaderText = "State";
+                DGV.Columns[7].HeaderText = "Zip";
+                DGV.Columns[8].HeaderText = "Status";
+                DGV.Columns[9].HeaderText = "Date Added";
+                DGV.Columns[2].AutoSizeMode = DataGridViewAutoSizeColumnMode.AllCells;    // Fixed issue with email not being fully displayed
                 DGV.Columns[4].AutoSizeMode = DataGridViewAutoSizeColumnMode.AllCells;    // Fixed issue with address not being fully displayed
+                DGV.Columns[9].AutoSizeMode = DataGridViewAutoSizeColumnMode.AllCells;    // Fixed issue with date added not being fully displayed
             }
             else
                 MessageBox.Show("There are currently no buyers in the database.", "No Users Found", MessageBoxButtons.OK, MessageBoxIcon.Warning);
@@ -153,5 +184,8 @@ namespace KPRestoration
             cmd.Parameters.AddWithValue("@searchQuery", searchQuery.Trim());
             db.PopulateDGV(DGV, cmd);
         }
+
+
+        
     }
 }

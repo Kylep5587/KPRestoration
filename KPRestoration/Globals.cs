@@ -137,12 +137,11 @@ namespace KPRestoration
          *  **************************************/
         public static bool IsNumeric(string s)
         {
-            bool validInput = false;
             Regex numeric = new Regex(@"^[0-9]");
-            if (numeric.IsMatch(s))
-                validInput = true;
+            if (numeric.IsMatch(s.Trim()))
+                return true;
 
-            return validInput;
+            return false;
         }
 
 

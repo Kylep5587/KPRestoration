@@ -157,7 +157,7 @@ namespace KPRestoration
         public bool Insert(string query)
         {
             //open connection
-            if (this.OpenConnection())
+            if (OpenConnection())
             {
                 try
                 {
@@ -170,7 +170,7 @@ namespace KPRestoration
                 }
                 catch
                 {
-                    this.CloseConnection();
+                    CloseConnection();
                     return false;
                 }
             }

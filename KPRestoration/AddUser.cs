@@ -1,4 +1,12 @@
-﻿using MySql.Data.MySqlClient;
+﻿/*********************************************************
+ * KP Restoration VMS                                    *
+ * Created 4/12/19 by Kyle Price                         *
+ * AddUser.cs - adds a user to the database              *
+ *  Opened from ManageUsers.cs                           *
+ *  Requires user rank of 3 to access                    *
+ * ******************************************************/
+
+using MySql.Data.MySqlClient;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;

@@ -1,13 +1,12 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
-using System.Drawing;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿/*********************************************************
+ * KP Restoration VMS                                    *
+ * Created 12/12/18 by Kyle Price                        *
+ * MainForm.cs - main application form. All other forms  *
+ *  open as child forms in the content panel of this form*
+ * ******************************************************/
+
+using System;
 using System.Windows.Forms;
-using System.Threading;
 
 namespace KPRestoration
 {

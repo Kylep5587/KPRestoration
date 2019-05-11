@@ -278,7 +278,7 @@
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedToolWindow;
             this.Name = "AddBuyer";
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
-            this.Text = "Add New Buyer";
+            this.Text = "New Buyer";
             this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.AddBuyer_FormClosing);
             this.ResumeLayout(false);
             this.PerformLayout();

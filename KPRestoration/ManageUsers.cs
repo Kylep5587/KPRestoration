@@ -9,6 +9,8 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using System.Net.Mail;
+using System.Globalization;
+using System.Text.RegularExpressions;
 
 namespace KPRestoration
 {
@@ -18,8 +20,15 @@ namespace KPRestoration
         private User selectedUser = new User();
         private Buyer buyer = new Buyer();
         private Buyer selectedBuyer = new Buyer();
+        private Seller seller = new Seller();
+        private Seller selectedSeller = new Seller();
+        private TitleHolder titleHolder = new TitleHolder();
+        private TitleHolder selectedHolder = new TitleHolder();
         private DatabaseHelper db = new DatabaseHelper();
-        private string query = null;
+        private bool userTabClicked = false;
+        private bool buyerTabClicked = false;
+        private bool sellerTabClicked = false;
+        private bool holderTabClicked = false;
 
 
         /* Constructor with userInfo parameter
@@ -29,18 +38,73 @@ namespace KPRestoration
             InitializeComponent();
             currentUser = userInfo;
             Globals.PopulateStateList(cbBuyerState);
-            currentUser.PopulateUserRanks(cbRank);
+            currentUser.PopulateUserRanks(cbUserRank);
             currentUser.PopulateDGV(dgvUsers);
         }
 
+        // Refresh methods called when add forms are closed
+        public void RefreshBuyerDGV()
+        {
+            buyer.PopulateDGV(dgvBuyers);
+        }
 
-        /* Called when Add User window closes
-         * *****************************/
         public void RefreshUserDGV()
         {
             currentUser.PopulateDGV(dgvUsers);
         }
         
+        public void RefreshSellerDGV()
+        {
+            seller.PopulateDGV(dgvSellers);
+        }
+
+        public void RefreshHolderDGV()
+        {
+            titleHolder.PopulateDGV(dgvHolders);
+        }
+
+
+        /* Populates DGV when tab clicked for the first time
+        * **************************************/
+        private void usersTabControl_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            switch (usersTabControl.SelectedTab.Name)
+            {
+                case "userTab":
+                    if (!userTabClicked)
+                    {
+                        currentUser.PopulateDGV(dgvUsers);
+                        userTabClicked = true;
+                        txtUserSearch.Focus();
+                    }
+                    break;
+                case "buyerTab":
+                    if (!buyerTabClicked)
+                    {
+                        buyer.PopulateDGV(dgvBuyers);
+                        buyerTabClicked = true;
+                        txtBuyerSearch.Focus();
+                    }
+                    break;
+                case "sellerTab":
+                    if (!sellerTabClicked)
+                    {
+                        seller.PopulateDGV(dgvSellers);
+                        sellerTabClicked = true;
+                        txtSellerSearch.Focus();
+                    }
+                    break;
+                case "holderTab":
+                    if (!holderTabClicked)
+                    {
+                        titleHolder.PopulateDGV(dgvHolders);
+                        holderTabClicked = true;
+                        txtHolderSearch.Focus();
+                    }
+                    break;
+            }
+        }
+
 
         /* Handles "Add User" menu option
          * *****************************/
@@ -53,17 +117,16 @@ namespace KPRestoration
 
         /* Clears user information fields
          * *****************************/
-        private void ResetFields()
+        private void ResetUserFields()
         {
-            username.Clear();
-            firstName.Clear();
-            lastName.Clear();
-            email.Clear();
-            phone.Clear();
-            cbRank.SelectedIndex = -1;
+            txtUsername.Clear();
+            txtUserFName.Clear();
+            txtUserLName.Clear();
+            txtUserEmail.Clear();
+            txtUserPhone.Clear();
+            cbUserRank.SelectedIndex = -1;
             cbUserStatus.SelectedIndex = -1;
             btnSaveEdit.Enabled = false;
-            btnEnable.Enabled = false;
             btnDeleteUser.Enabled = false;
             lblCurrentUser.Visible = false;
 
@@ -72,39 +135,46 @@ namespace KPRestoration
         }
 
 
-        /* Disables all fields
+        /* Populates user info fields when a user is selected
          * *****************************/
-        private void DisableFields()
+        private void dgvUsers_CellClick(object sender, DataGridViewCellEventArgs e)
         {
-            username.Enabled = false;
-            firstName.Enabled = false;
-            lastName.Enabled = false;
-            email.Enabled = false;
-            phone.Enabled = false;
-            cbUserStatus.Enabled = false;
-            cbRank.Enabled = false;
-            btnSaveEdit.Enabled = false;
-        }
-
-
-        /* Enable all user info fields when "Enable Editing" clicked
-         * **************************************/
-        private void btnEnable_Click(object sender, EventArgs e)
-        {
-            if (username.Text == "" || firstName.Text == "")
+            int index = e.RowIndex;
+            if (index >= 0) // Only perform actions if the selected row is part of the table - Fixes issue error from clicking on cell header
             {
-                MessageBox.Show("Please select a user to edit.");
+                DataGridViewRow selectedRow = dgvUsers.Rows[index];
+
+                string[] nameArray = selectedRow.Cells[2].Value.ToString().Split(' '); // Breaks name into first and last
+
+                // Assign values and populate editable fields
+                selectedUser.Id = Convert.ToInt32(selectedRow.Cells[0].Value.ToString().Trim());
+                selectedUser.Username = txtUsername.Text = selectedRow.Cells[1].Value.ToString();
+                selectedUser.FirstName = txtUserFName.Text = nameArray[0];
+                selectedUser.LastName = txtUserLName.Text = nameArray[1];
+                selectedUser.Email = txtUserEmail.Text = selectedRow.Cells[3].Value.ToString();
+                selectedUser.Phone = txtUserPhone.Text = selectedRow.Cells[4].Value.ToString();
+                cbUserRank.SelectedItem = selectedUser.Rank = Convert.ToInt16(selectedRow.Cells[5].Value);
+                cbUserStatus.SelectedItem = selectedUser.Status = selectedRow.Cells[6].Value.ToString();
             }
-            else
+
+            // User tab inputs
+            Label[] userLabels = { lblCurrentUser };
+            TextBox[] userFields = { txtUsername, txtUserFName, txtUserLName, txtUserEmail, txtUserPhone };
+            TextBox[] currentUserFields = { txtUsername };
+            ComboBox[] userComboBoxes = { cbUserStatus, cbUserRank };
+            Button[] userButtons = { btnSaveEdit, btnDeleteUser };
+            Button[] currentUserBtns = { btnDeleteUser };
+
+            // Enable delete button when user is selected only if user is not current user
+            if (selectedUser.Id != currentUser.Id)
             {
-                username.Enabled = true;
-                firstName.Enabled = true;
-                lastName.Enabled = true;
-                email.Enabled = true;
-                phone.Enabled = true;
-                cbUserStatus.Enabled = true;
-                cbRank.Enabled = true;
-                btnSaveEdit.Enabled = true;
+                selectedUser.EnableFields(userFields, userComboBoxes, userButtons, userLabels);
+                lblCurrentUser.Hide();
+            }
+            else  // Disable editing if current user selected
+            {
+                selectedUser.DisableFields(currentUserFields, userComboBoxes, currentUserBtns, userLabels);
+                lblCurrentUser.Show();
             }
         }
 
@@ -113,123 +183,53 @@ namespace KPRestoration
          * *****************************/
         private void btnSaveEdit_Click(object sender, EventArgs e)
         {
-            string phoneNumber = null;
-            bool isValidPhone = false;
             string errors = null;
 
-            // Validate email
-            bool isValidEmail = Globals.IsEmail(email.Text);
-            if (!isValidEmail) { errors += "\u2022 Invalid email address\n"; }
+            // Retrieve user password
+            MySqlCommand cmd = new MySqlCommand("GET_USER_PASSWORD", db.conn);
+            cmd.CommandType = CommandType.StoredProcedure;
+            cmd.Parameters.AddWithValue("@id", SqlDbType.Int).Value = selectedUser.Id;
+            cmd.Parameters["@id"].Direction = ParameterDirection.Input;
+            cmd.Parameters.AddWithValue("@userPass", SqlDbType.VarChar).Direction = ParameterDirection.Output;
+            db.ExecuteCommand(cmd);
+            
+            // Set values
+            selectedUser.Password = cmd.Parameters["@userPass"].Value.ToString();   // Assign password retrieved from stored procedure exuction above
+            selectedUser.FirstName = txtUserFName.Text;
+            selectedUser.LastName = txtUserLName.Text;
+            selectedUser.Email = txtUserEmail.Text;
+            selectedUser.Phone = txtUserPhone.Text;
+            selectedUser.Status = cbUserStatus.SelectedItem.ToString();
+            selectedUser.Rank = Convert.ToInt16(cbUserRank.SelectedItem.ToString());
+            
+            // Check entered data
+            errors = selectedUser.CheckData("user", "Update", selectedUser.Phone, selectedUser.Email, selectedUser.FirstName, selectedUser.LastName, selectedUser.Zip.ToString(), null);
 
-            // Verify phone can be formatted properly if entered
-            if (phone.Text != "" || phone.Text != null)
+            // Prevent user from modifying rank or access level of themselves
+            if (selectedUser.Id == currentUser.Id && (selectedUser.Rank != currentUser.Rank || selectedUser.Username != currentUser.Username || selectedUser.Status != currentUser.Status))
+                MessageBox.Show("You cannot modify the username, rank, or status of the account you are currently logged in on. To modify these values for this user, please login from a different account.", "Edit Restricted", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+            else if (errors == null) // Errors were found in submitted data
             {
-                if (Globals.IsPhoneNumber(phone.Text))
-                {
-                    phoneNumber = Globals.FormatPhoneNumber(phone.Text);
-                    isValidPhone = true; 
-                }
-                else
-                {
-                    isValidPhone = false;
-                    errors += "\u2022 Invalid phone number\n";
-                }
+                selectedUser.Update();
+                selectedUser.PopulateDGV(dgvUsers);
             }
-
-
-            if (!isValidEmail || !isValidPhone) // Show error and do not execute update query if invalid input is found
-                MessageBox.Show("Please fix the following errors and try again: \n\n" + errors + "\n", "Update Error", MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
-            else // Execute query if inpout is valid
-            {
-                // Prevent user from modifying rank or access level of themselves
-                if (selectedUser.Id == currentUser.Id && (username.Text != currentUser.Username || Convert.ToInt32(cbRank.Text.ToString()) != currentUser.Rank || cbUserStatus.Text != currentUser.Status))
-                {
-                    MessageBox.Show("You cannot modify the rank or status of the account you are currently logged in on. To modify these values for this user, please login from a different account.", "Edit Restricted", MessageBoxButtons.OK, MessageBoxIcon.Warning);
-                }
-                else
-                {
-                    string updateQuery = "UPDATE Users SET username = @user, firstName = @firstName, lastName = @lastName, email = @email, phone = @phone, rank = @rank, userStatus = @userStatus  WHERE userID = @selectedID";
-                    MySqlCommand cmd = new MySqlCommand(updateQuery, db.conn);
-                    cmd.Parameters.AddWithValue("@user", username.Text);
-                    cmd.Parameters.AddWithValue("@firstName", firstName.Text);
-                    cmd.Parameters.AddWithValue("@lastName", lastName.Text);
-                    cmd.Parameters.AddWithValue("@email", email.Text);
-                    cmd.Parameters.AddWithValue("@phone", phoneNumber);
-                    cmd.Parameters.AddWithValue("@rank", Convert.ToInt32(cbRank.Text.ToString()));
-                    cmd.Parameters.AddWithValue("@userStatus", cbUserStatus.Text.ToString());
-                    cmd.Parameters.AddWithValue("@selectedID", selectedUser.Id);
-
-                    if (db.ExecuteCommand(cmd))
-                    {
-                        MessageBox.Show("User information updated.", "Update Successful", MessageBoxButtons.OK, MessageBoxIcon.Information);
-                        ResetFields();
-                        DisableFields();
-                        currentUser.PopulateDGV(dgvUsers);
-                    }
-                    else
-                    {
-                        MessageBox.Show("Error encountered while updating user information!", "Update Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                    }
-                }
-            }
+            else
+                MessageBox.Show("Please correct the following errors and try again: \n" + errors, "Update Error", MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
         }
         
-
-        /* Populates user info fields when selected
-         * *****************************/
-        private void dgvUsers_CellClick(object sender, DataGridViewCellEventArgs e)
-        {
-            btnDeleteUser.Enabled = true;
-            btnEnable.Enabled = true;
-            DisableFields();
-
-            User selectedUser = new User();
-
-            int index = e.RowIndex;
-            if (index >= 0) // Only perform actions if the selected row is part of the table - Fixes issue error from clicking on cell header
-            {
-                DataGridViewRow selectedRow = dgvUsers.Rows[index];
-
-                string[] nameArray = selectedRow.Cells[2].Value.ToString().Split(' '); // Breaks name into first and last
-
-                selectedUser.Id = Convert.ToInt32(selectedRow.Cells[0].Value);
-                selectedUser.Username = username.Text = selectedRow.Cells[1].Value.ToString();
-                selectedUser.FirstName = firstName.Text = nameArray[0];
-                selectedUser.LastName = lastName.Text = nameArray[1];
-                selectedUser.Email = email.Text = selectedRow.Cells[3].Value.ToString();
-                selectedUser.Phone = phone.Text = selectedRow.Cells[4].Value.ToString();
-                cbRank.SelectedItem = selectedUser.Rank = Convert.ToInt16(selectedRow.Cells[5].Value);
-                cbUserStatus.SelectedItem = selectedUser.Status = selectedRow.Cells[6].Value.ToString();
-
-                // Show or hide current user warning 
-                if (currentUser.Username == selectedRow.Cells[1].Value.ToString())
-                {
-                    lblCurrentUser.Visible = true;
-                    btnDeleteUser.Enabled = false;
-                    btnEnable.Enabled = false; // Disable enable editing button 
-                }
-                else
-                {
-                    lblCurrentUser.Visible = false;
-                    btnDeleteUser.Enabled = true;
-                    btnEnable.Enabled = true;
-                }
-            }
-        }
-
-
+        
         /* Removes selected user from the database
          * *****************************/
         private void btnDeleteUser_Click(object sender, EventArgs e)
         {
-            string deleteUsername = username.Text;
+            string deleteUsername = txtUsername.Text;
 
             if (selectedUser.Id == currentUser.Id || deleteUsername == currentUser.Username) // Prevent deletion of current user
             {
                 MessageBox.Show("You cannot delete the current user. To delete this user, login from another account and try again.", "Delete Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
             else
-                selectedUser.Delete(deleteUsername, dgvUsers);
+                selectedUser.Delete("user", deleteUsername, dgvUsers);
         }
 
 
@@ -237,7 +237,7 @@ namespace KPRestoration
         * **************************************/
         private void btnSearchUsers_Click(object sender, EventArgs e)
         {
-            currentUser.Search(dgvUsers, txtUserSearch.Text);
+            currentUser.Search(dgvUsers, txtUserSearch.Text, "users");
         }
 
 
@@ -245,7 +245,7 @@ namespace KPRestoration
         * **************************************/
         private void txtUserSearch_TextChanged(object sender, EventArgs e)
         {
-            currentUser.Search(dgvUsers, txtUserSearch.Text);
+            currentUser.Search(dgvUsers, txtUserSearch.Text, "users");
         }
 
         /* ==============================================================
@@ -262,20 +262,15 @@ namespace KPRestoration
         }
 
 
-        /* Called when Add Buyer window closes
-         * *****************************/
-        public void RefreshBuyerDGV()
-        {
-            buyer.PopulateDGV(dgvBuyers);
-        }
-
-
         /* Populates buyer information fields when DGV row selected
         * **************************************/
         private void dgvBuyers_CellClick(object sender, DataGridViewCellEventArgs e)
         {
-            btnDeleteBuyer.Enabled = true;
-            btnSaveBuyerEdit.Enabled = true;
+            Label[] buyerLabels = { };
+            TextBox[] buyerFields = { txtBuyerFName, txtBuyerLName, txtBuyerEmail, txtBuyerPhone, txtBuyerAddress, txtBuyerCity, txtBuyerZip };
+            ComboBox[] buyerComboBoxes = { cbBuyerState, cbBuyerStatus };
+            Button[] buyerButtons = { btnSaveBuyerEdit, btnDeleteBuyer };
+            selectedBuyer.EnableFields(buyerFields, buyerComboBoxes, buyerButtons, buyerLabels);
 
             int index = e.RowIndex;
             if (index >= 0) // Only perform actions if the selected row is part of the table - Fixes issue error from clicking on cell header
@@ -283,29 +278,23 @@ namespace KPRestoration
                 DataGridViewRow selectedRow = dgvBuyers.Rows[index];
 
                 string[] buyerNameArray = selectedRow.Cells[1].Value.ToString().Split(' ');     // Breaks last name and first name apart
+                int? zip = null;
+                if (selectedRow.Cells[7].Value.ToString().Trim() != "")
+                    zip = Convert.ToInt32(selectedRow.Cells[7].Value.ToString().Trim());
 
-                // Set selected buyer info
+                // Set selected buyer info & populate text fields
                 selectedBuyer.Id = Convert.ToInt32(selectedRow.Cells[0].Value.ToString().Trim());
-                selectedBuyer.FirstName = buyerNameArray[0];
-                selectedBuyer.LastName = buyerNameArray[1];
-                selectedBuyer.Email = selectedRow.Cells[2].Value.ToString().Trim();
-                selectedBuyer.Phone = selectedRow.Cells[3].Value.ToString().Trim();
-                selectedBuyer.Address = selectedRow.Cells[4].Value.ToString().Trim();
-                selectedBuyer.City = selectedRow.Cells[5].Value.ToString().Trim();
-                selectedBuyer.State = selectedRow.Cells[6].Value.ToString().Trim();
-                selectedBuyer.Zip = Convert.ToInt32(selectedRow.Cells[7].Value.ToString().Trim());
-                selectedBuyer.BuyerStatus = selectedRow.Cells[8].Value.ToString().Trim();
-
-                // Populate text fields
-                txtFirstName.Text = selectedBuyer.FirstName;
-                txtLastName.Text = selectedBuyer.LastName;
-                txtBuyerEmail.Text = selectedBuyer.Email;
-                txtBuyerPhone.Text = selectedBuyer.Phone;
-                txtBuyerAddress.Text = selectedBuyer.Address;
-                txtBuyerCity.Text = selectedBuyer.City;
-                cbBuyerState.SelectedItem = selectedBuyer.State;
-                txtBuyerZip.Text = selectedBuyer.Zip.ToString();
-                cbBuyerStatus.SelectedItem = selectedRow.Cells[8].Value.ToString();
+                txtBuyerFName.Text = selectedBuyer.FirstName = buyerNameArray[0];
+                txtBuyerLName.Text = selectedBuyer.LastName = buyerNameArray[1];
+                txtBuyerEmail.Text = selectedBuyer.Email = selectedRow.Cells[2].Value.ToString().Trim();
+                txtBuyerPhone.Text = selectedBuyer.Phone = selectedRow.Cells[3].Value.ToString().Trim();
+                txtBuyerAddress.Text = selectedBuyer.Address = selectedRow.Cells[4].Value.ToString().Trim();
+                txtBuyerCity.Text = selectedBuyer.City = selectedRow.Cells[5].Value.ToString().Trim();
+                cbBuyerState.SelectedItem = selectedBuyer.State = selectedRow.Cells[6].Value.ToString().Trim();
+                selectedBuyer.Zip = zip;
+                txtBuyerZip.Text = zip.ToString();
+                cbBuyerStatus.SelectedItem = selectedBuyer.BuyerStatus = selectedRow.Cells[8].Value.ToString().Trim();
+                
             }
         }
 
@@ -315,15 +304,7 @@ namespace KPRestoration
         private void btnDeleteBuyer_Click(object sender, EventArgs e)
         {
             string buyerName = selectedBuyer.FirstName + " " + selectedBuyer.LastName;
-            selectedBuyer.Delete(buyerName, dgvBuyers);
-        }
-
-
-        /* Populates dgvBuyers when "Buyer" tab clicked
-        * **************************************/
-        private void usersTabControl_Click(object sender, EventArgs e)
-        {
-            buyer.PopulateDGV(dgvBuyers);
+            selectedBuyer.Delete("buyer", buyerName, dgvBuyers);
         }
 
 
@@ -331,7 +312,7 @@ namespace KPRestoration
         * **************************************/
         private void txtBuyerSearch_TextChanged(object sender, EventArgs e)
         {
-            buyer.Search(dgvBuyers, txtBuyerSearch.Text);
+            buyer.Search(dgvBuyers, txtBuyerSearch.Text, "buyers");
         }
 
 
@@ -339,7 +320,7 @@ namespace KPRestoration
         * **************************************/
         private void btnSearchBuyer_Click(object sender, EventArgs e)
         {
-            buyer.Search(dgvBuyers, txtBuyerSearch.Text);
+            buyer.Search(dgvBuyers, txtBuyerSearch.Text, "buyers");
         }
 
 
@@ -351,8 +332,8 @@ namespace KPRestoration
             if (txtBuyerZip.Text.Length == 5)
                 selectedBuyer.Zip = Convert.ToInt32(txtBuyerZip.Text.Trim());
 
-            selectedBuyer.FirstName = txtFirstName.Text;
-            selectedBuyer.LastName = txtLastName.Text;
+            selectedBuyer.FirstName = txtBuyerFName.Text;
+            selectedBuyer.LastName = txtBuyerLName.Text;
             selectedBuyer.Email = txtBuyerEmail.Text;
             selectedBuyer.Phone = txtBuyerPhone.Text;
             selectedBuyer.Address = txtBuyerAddress.Text;
@@ -360,11 +341,11 @@ namespace KPRestoration
             if (cbBuyerState.SelectedItem != null) { selectedBuyer.State = cbBuyerState.SelectedItem.ToString(); }
             selectedBuyer.BuyerStatus = cbBuyerStatus.SelectedItem.ToString();
 
-            errors = selectedBuyer.CheckData("Buyer", "Update", selectedBuyer.Phone, selectedBuyer.Email, selectedBuyer.FirstName, selectedBuyer.LastName, selectedBuyer.Zip.ToString());
+            errors = selectedBuyer.CheckData("Buyer", "Update", selectedBuyer.Phone, selectedBuyer.Email, selectedBuyer.FirstName, selectedBuyer.LastName, selectedBuyer.Zip.ToString(), null);
 
             if (errors == null)
             {
-                selectedBuyer.Phone = Globals.FormatPhoneNumber(txtBuyerPhone.Text.Trim());
+                //selectedBuyer.Phone = Globals.FormatPhoneNumber(txtBuyerPhone.Text.Trim());
                 selectedBuyer.Update();
                 selectedBuyer.PopulateDGV(dgvBuyers);
             }
@@ -372,5 +353,158 @@ namespace KPRestoration
                 MessageBox.Show("Please correct the following errors and try again: \n" + errors, "Update Error", MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
         }
 
+        /* ==============================================================
+         ======================= Seller Related Code =====================
+         ================================================================*/
+        /* Populates seller information fields when DGV row selected
+       * **************************************/
+        private void dgvSellers_CellClick(object sender, DataGridViewCellEventArgs e)
+        {
+            Label[] sellerLabels = { };
+            TextBox[] sellerFields = { txtSellerFName, txtSellerLName, txtSellerEmail, txtSellerPhone, txtSellerAddress, txtSellerCity, txtSellerZip };
+            ComboBox[] sellerComboBoxes = { cbSellerState, cbSellerStatus };
+            Button[] sellerButtons = { btnSaveSellerEdit, btnDeleteSeller };
+            selectedSeller.EnableFields(sellerFields, sellerComboBoxes, sellerButtons, sellerLabels);
+
+            int index = e.RowIndex;
+            if (index >= 0) // Only perform actions if the selected row is part of the table - Fixes issue error from clicking on cell header
+            {
+                DataGridViewRow selectedRow = dgvSellers.Rows[index];
+
+                string[] sellerName = selectedRow.Cells[1].Value.ToString().Split(' ');     // Breaks last name and first name apart
+                int? zip = null;
+                if (selectedRow.Cells[7].Value.ToString().Trim() != "")
+                    zip = Convert.ToInt32(selectedRow.Cells[7].Value.ToString().Trim());
+
+                // Set selected buyer info & populate text fields
+                selectedBuyer.Id = Convert.ToInt32(selectedRow.Cells[0].Value.ToString().Trim());
+                txtSellerFName.Text = selectedSeller.FirstName = sellerName[0];
+                txtSellerLName.Text = selectedSeller.LastName = sellerName[1];
+                txtSellerEmail.Text = selectedSeller.Email = selectedRow.Cells[2].Value.ToString().Trim();
+                txtSellerPhone.Text = selectedSeller.Phone = selectedRow.Cells[3].Value.ToString().Trim();
+                txtSellerAddress.Text = selectedSeller.Address = selectedRow.Cells[4].Value.ToString().Trim();
+                txtSellerCity.Text = selectedSeller.City = selectedRow.Cells[5].Value.ToString().Trim();
+                cbSellerState.SelectedItem = selectedSeller.State = selectedRow.Cells[6].Value.ToString().Trim();
+                selectedSeller.Zip = zip;
+                txtBuyerZip.Text = zip.ToString();
+                cbSellerStatus.SelectedItem = selectedSeller.SellerStatus = selectedRow.Cells[8].Value.ToString().Trim();
+            }
+        }
+
+
+        /* Open add seller window
+         * *********************************/
+        private void btnAddSeller_Click(object sender, EventArgs e)
+        {
+            AddSeller form = new AddSeller(currentUser, this);
+            form.Show();
+        }
+
+
+        /* ==============================================================
+         ==================== Title Holder Related Code =================
+         ================================================================*/
+        /* Populates title holder information fields when DGV row selected
+        * **************************************/
+        private void dgvHolders_CellClick(object sender, DataGridViewCellEventArgs e)
+        {
+            Label[] holderLabels = { };
+            TextBox[] holderFields = { txtHolderFName, txtHolderLName, txtHolderEmail, txtHolderPhone, txtHolderAddress, txtHolderCity, txtHolderZip, txtHolderFee };
+            ComboBox[] holderComboBoxes = { cbHolderState, cbHolderStatus, cbHolderFeeType };
+            Button[] holderButtons = { btnSaveHolderEdit, btnDeleteHolder };
+            selectedHolder.EnableFields(holderFields, holderComboBoxes, holderButtons, holderLabels);
+
+            int index = e.RowIndex;
+            if (index >= 0) // Only perform actions if the selected row is part of the table - Fixes issue error from clicking on cell header
+            {
+                DataGridViewRow selectedRow = dgvHolders.Rows[index];
+                string fee = selectedRow.Cells[9].Value.ToString().Trim();     
+                string[] holderName = selectedRow.Cells[1].Value.ToString().Split(' ');     // Breaks last name and first name apart
+                string feeValue = " ";
+                string feeType;
+                int? zip = null;
+
+                // Determine fee type 
+                if (fee.Contains('$')) 
+                {
+                    feeValue = fee.Replace("$", "");
+                    feeType = "Flat Fee";
+                }
+                else
+                {
+                    feeValue = fee.Replace("%", "");
+                    feeType = "Percentage";
+                }
+
+                if (selectedRow.Cells[7].Value.ToString().Trim() != "")
+                    zip = Convert.ToInt32(selectedRow.Cells[7].Value.ToString().Trim());
+                
+                // Set selected holder info & populate text fields
+                selectedHolder.Id = Convert.ToInt32(selectedRow.Cells[0].Value.ToString().Trim());
+                txtHolderFName.Text = selectedHolder.FirstName = holderName[0];
+                txtHolderLName.Text = selectedHolder.LastName = holderName[1];
+                txtHolderEmail.Text = selectedHolder.Email = selectedRow.Cells[2].Value.ToString().Trim();
+                txtHolderPhone.Text = selectedHolder.Phone = selectedRow.Cells[3].Value.ToString().Trim();
+                txtHolderAddress.Text = selectedHolder.Address = selectedRow.Cells[4].Value.ToString().Trim();
+                txtHolderCity.Text = selectedHolder.City = selectedRow.Cells[5].Value.ToString().Trim();
+                cbHolderState.SelectedItem = selectedHolder.State = selectedRow.Cells[6].Value.ToString().Trim();
+                selectedHolder.Zip = zip;
+                txtHolderZip.Text = zip.ToString();
+                cbHolderStatus.SelectedItem = selectedHolder.Status = selectedRow.Cells[8].Value.ToString().Trim();
+                txtHolderFee.Text = feeValue;
+                selectedHolder.Fee = Convert.ToInt32(feeValue);
+                cbHolderFeeType.SelectedItem = selectedHolder.FeeType = feeType;
+                if (feeValue != "")
+                    selectedHolder.Fee = Convert.ToInt16(feeValue);
+                else
+                    selectedHolder.Fee = 0;
+            }
+        }
+
+
+        /* Edit title holder information
+         * ***********************************/
+        private void btnSaveHolderEdit_Click(object sender, EventArgs e)
+        {
+            string errors = null;
+
+            selectedHolder.FirstName = txtHolderFName.Text;
+            selectedHolder.LastName = txtHolderLName.Text;
+            selectedHolder.Email = txtHolderEmail.Text;
+            selectedHolder.Phone = txtHolderPhone.Text;
+            selectedHolder.Address = txtHolderAddress.Text;
+            selectedHolder.City = txtHolderCity.Text;
+            if (cbHolderState.SelectedItem != null) { selectedHolder.State = cbHolderState.SelectedItem.ToString(); }
+            if (cbHolderFeeType.SelectedItem != null) { selectedHolder.FeeType = cbHolderFeeType.SelectedItem.ToString(); }
+            if (txtHolderZip.Text.Trim() != "") { selectedHolder.Zip = Convert.ToInt32(txtHolderZip.Text.Trim()); }
+            selectedHolder.Status = cbHolderStatus.SelectedItem.ToString();
+
+            if (txtHolderFee.Text != "")
+            {
+                Regex pattern = new Regex("[$%]");
+                selectedHolder.Fee = Convert.ToInt32(pattern.Replace(txtHolderFee.Text, "").Trim());
+            }
+
+            // Check for input errors
+            errors = selectedHolder.CheckData("Holder", "Update", selectedHolder.Phone, selectedHolder.Email, selectedHolder.FirstName, selectedHolder.LastName, selectedHolder.Zip.ToString(), selectedHolder.Fee.ToString());
+
+            if (errors == null)
+            {
+                selectedHolder.Phone = Globals.FormatPhoneNumber(txtHolderPhone.Text.Trim());
+                selectedHolder.Update();
+                selectedHolder.PopulateDGV(dgvHolders);
+            }
+            else
+                MessageBox.Show("Please correct the following errors and try again: \n" + errors, "Update Error", MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
+        }
+
+
+        /* Open add title holder window
+         * ***********************************/
+        private void btnAddHolder_Click(object sender, EventArgs e)
+        {
+            AddTitleHolder form = new AddTitleHolder(currentUser, this);
+            form.Show();
+        }
     }
 }

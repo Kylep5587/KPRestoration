@@ -238,8 +238,6 @@
             // 
             // panelContent
             // 
-            this.panelContent.AutoSize = true;
-            this.panelContent.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
             this.panelContent.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(239)))), ((int)(((byte)(239)))), ((int)(((byte)(239)))));
             this.panelContent.Dock = System.Windows.Forms.DockStyle.Fill;
             this.panelContent.Location = new System.Drawing.Point(220, 0);
@@ -251,6 +249,7 @@
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
+            this.AutoSize = true;
             this.ClientSize = new System.Drawing.Size(1434, 691);
             this.Controls.Add(this.panelContent);
             this.Controls.Add(this.panelMenu);
@@ -266,14 +265,12 @@
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.logoContainer)).EndInit();
             this.ResumeLayout(false);
-            this.PerformLayout();
 
         }
 
         #endregion
 
         private System.Windows.Forms.Panel panelMenu;
-        private System.Windows.Forms.Panel panelContent;
         private System.Windows.Forms.PictureBox logoContainer;
         private System.Windows.Forms.Button btnHome;
         private System.Windows.Forms.Button btnPotentialPurchases;
@@ -285,6 +282,7 @@
         private System.Windows.Forms.PictureBox pictureBox1;
         private System.Windows.Forms.LinkLabel lblLogout;
         private System.Windows.Forms.Label lblUsername;
+        private System.Windows.Forms.Panel panelContent;
     }
 }
 

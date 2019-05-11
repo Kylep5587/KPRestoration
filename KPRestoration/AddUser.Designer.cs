@@ -46,6 +46,8 @@
             this.btnCancelAdd = new System.Windows.Forms.Button();
             this.lblPassword = new System.Windows.Forms.Label();
             this.txtInitialPass = new System.Windows.Forms.TextBox();
+            this.cbCreateSeller = new System.Windows.Forms.CheckBox();
+            this.cbCreateHolder = new System.Windows.Forms.CheckBox();
             this.SuspendLayout();
             // 
             // cbRank
@@ -156,11 +158,11 @@
             this.btnAddUser.FlatAppearance.BorderSize = 0;
             this.btnAddUser.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.btnAddUser.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(239)))), ((int)(((byte)(239)))), ((int)(((byte)(239)))));
-            this.btnAddUser.Location = new System.Drawing.Point(61, 302);
+            this.btnAddUser.Location = new System.Drawing.Point(61, 330);
             this.btnAddUser.Name = "btnAddUser";
             this.btnAddUser.Size = new System.Drawing.Size(75, 23);
             this.btnAddUser.TabIndex = 22;
-            this.btnAddUser.Text = "Add User";
+            this.btnAddUser.Text = "Create";
             this.btnAddUser.UseVisualStyleBackColor = false;
             this.btnAddUser.Click += new System.EventHandler(this.btnAddUser_Click);
             // 
@@ -181,7 +183,7 @@
             this.btnCancelAdd.FlatAppearance.BorderSize = 0;
             this.btnCancelAdd.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.btnCancelAdd.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(239)))), ((int)(((byte)(239)))), ((int)(((byte)(239)))));
-            this.btnCancelAdd.Location = new System.Drawing.Point(182, 302);
+            this.btnCancelAdd.Location = new System.Drawing.Point(182, 330);
             this.btnCancelAdd.Name = "btnCancelAdd";
             this.btnCancelAdd.Size = new System.Drawing.Size(75, 23);
             this.btnCancelAdd.TabIndex = 25;
@@ -207,13 +209,35 @@
             this.txtInitialPass.Size = new System.Drawing.Size(150, 20);
             this.txtInitialPass.TabIndex = 2;
             // 
+            // cbCreateSeller
+            // 
+            this.cbCreateSeller.AutoSize = true;
+            this.cbCreateSeller.Location = new System.Drawing.Point(47, 291);
+            this.cbCreateSeller.Name = "cbCreateSeller";
+            this.cbCreateSeller.Size = new System.Drawing.Size(86, 17);
+            this.cbCreateSeller.TabIndex = 28;
+            this.cbCreateSeller.Text = "Create Seller";
+            this.cbCreateSeller.UseVisualStyleBackColor = true;
+            // 
+            // cbCreateHolder
+            // 
+            this.cbCreateHolder.AutoSize = true;
+            this.cbCreateHolder.Location = new System.Drawing.Point(161, 291);
+            this.cbCreateHolder.Name = "cbCreateHolder";
+            this.cbCreateHolder.Size = new System.Drawing.Size(114, 17);
+            this.cbCreateHolder.TabIndex = 29;
+            this.cbCreateHolder.Text = "Create Title Holder";
+            this.cbCreateHolder.UseVisualStyleBackColor = true;
+            // 
             // AddUser
             // 
             this.AcceptButton = this.btnAddUser;
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.CancelButton = this.btnCancelAdd;
-            this.ClientSize = new System.Drawing.Size(319, 344);
+            this.ClientSize = new System.Drawing.Size(319, 374);
+            this.Controls.Add(this.cbCreateHolder);
+            this.Controls.Add(this.cbCreateSeller);
             this.Controls.Add(this.txtInitialPass);
             this.Controls.Add(this.lblPassword);
             this.Controls.Add(this.btnCancelAdd);
@@ -261,5 +285,7 @@
         private System.Windows.Forms.Button btnCancelAdd;
         private System.Windows.Forms.Label lblPassword;
         private System.Windows.Forms.TextBox txtInitialPass;
+        private System.Windows.Forms.CheckBox cbCreateSeller;
+        private System.Windows.Forms.CheckBox cbCreateHolder;
     }
 }

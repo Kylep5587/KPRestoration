@@ -20,32 +20,11 @@ namespace KPRestoration
 
         public string BuyerStatus { get => buyerStatus; set => buyerStatus = value; }
 
-        /* Enters current User object data into database
-         * *****************************************/
-        public override bool Add()
-        {
-            bool buyerCreated = false;
-            string query = "INSERT INTO Buyers (firstName, lastName, address, city, state, zip, phone, email, buyerStatus) VALUES " +
-                "(@fName, @lName, @address, @city, @state, @zip, @phone, @email, @status)";
-            MySqlCommand cmd = new MySqlCommand(query, db.conn);
-            cmd.Parameters.AddWithValue("@fName", this.FirstName);
-            cmd.Parameters.AddWithValue("@lName", this.LastName);
-            cmd.Parameters.AddWithValue("@address", this.Address);
-            cmd.Parameters.AddWithValue("@city", this.City);
-            cmd.Parameters.AddWithValue("@state", this.State);
-            cmd.Parameters.AddWithValue("@zip", this.Zip);
-            cmd.Parameters.AddWithValue("@phone", this.Phone);
-            cmd.Parameters.AddWithValue("@email", this.Email);
-            cmd.Parameters.AddWithValue("@status", this.BuyerStatus);
-            return buyerCreated = db.ExecuteCommand(cmd);
-        }
-
 
         /* Overloaded version of AddBuyer() that takes values 
          * *****************************************/
         public bool Add(string fName, string lName, string phone, string email, string buyerStatus)
         {
-            bool buyerCreated = false;
             string query = "INSERT INTO Buyers (firstName, lastName, phone, email, buyerStatus) VALUES " +
                 "(@fName, @lName, @phone, @email, @status)";
             MySqlCommand cmd = new MySqlCommand(query, db.conn);
@@ -54,7 +33,7 @@ namespace KPRestoration
             cmd.Parameters.AddWithValue("@phone", phone);
             cmd.Parameters.AddWithValue("@email", email);
             cmd.Parameters.AddWithValue("@status", buyerStatus);
-            return buyerCreated = db.ExecuteCommand(cmd);
+            return db.ExecuteCommand(cmd);
         }
 
 
@@ -87,66 +66,6 @@ namespace KPRestoration
             }
         }
 
-
-        /* Delete buyer information
-         * *****************************************/
-        public override void Delete()
-        {
-            string query = "DELETE FROM Buyers WHERE buyerID = @buyerID";
-            MySqlCommand cmd = new MySqlCommand(query, db.conn);
-            cmd.Parameters.AddWithValue("@buyerID", Id);
-
-            try
-            {
-                db.ExecuteCommand(cmd);
-                MessageBox.Show("Buyer deleted successfully!", "Success", MessageBoxButtons.OK, MessageBoxIcon.Information);
-            }
-            catch (MySqlException)
-            {
-                MessageBox.Show("The buyer is associated with a vehicle currently in the database. The vehicle entry must be deleted or buyer changed before deleting this buyer.", "Delete Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
-            }
-            catch
-            {
-                MessageBox.Show("Error while attempting to delete the buyer!", "Delete Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
-            }
-        }
-
-
-        /* Delete buyer information - takes string and DGV parameters
-         * *****************************************/
-        public override void Delete(string name, DataGridView DGV)
-        {
-            System.Windows.Forms.DialogResult DialogResult = MessageBox.Show("Are you sure you want to delete the buyer: \"" + name + "\"?", "Confirm", MessageBoxButtons.YesNo, MessageBoxIcon.Warning);
-            if (DialogResult == DialogResult.Yes) // User confirmed delete
-            {
-                if (name == " ") // No user selected
-                    MessageBox.Show("Please select a buyer to delete.", "No buyer Selected", MessageBoxButtons.OK, MessageBoxIcon.Warning);
-                else
-                {
-                    string query = "DELETE FROM Buyers WHERE buyerID = @buyerID";
-                    MySqlCommand cmd = new MySqlCommand(query, db.conn);
-                    cmd.Parameters.AddWithValue("@buyerID", Id);
-
-                    try
-                    {
-                        db.ExecuteCommand(cmd);
-                        MessageBox.Show("Buyer deleted successfully!", "Success", MessageBoxButtons.OK, MessageBoxIcon.Information);
-                        PopulateDGV(DGV);
-                    }
-                    catch (MySqlException)
-                    {
-                        MessageBox.Show("The buyer is associated with a vehicle currently in the database. The vehicle entry must be deleted or buyer changed before deleting this buyer.", "Delete Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                    }
-                    catch
-                    {
-                        MessageBox.Show("Error while attempting to delete the buyer!", "Delete Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                    }
-                    
-                }
-            }
-        }
-
-
         /* Populate buyer DGV headers and rows
          * *****************************/
         public override void PopulateDGV(DataGridView DGV)
@@ -167,25 +86,8 @@ namespace KPRestoration
                 DGV.Columns[4].AutoSizeMode = DataGridViewAutoSizeColumnMode.AllCells;    // Fixed issue with address not being fully displayed
                 DGV.Columns[9].AutoSizeMode = DataGridViewAutoSizeColumnMode.AllCells;    // Fixed issue with date added not being fully displayed
             }
-            else
-                MessageBox.Show("There are currently no buyers in the database.", "No Users Found", MessageBoxButtons.OK, MessageBoxIcon.Warning);
 
         }
-
-
-        /* Populates dgvBuyers with search results
-         *      Called when user types in search box or clicks search
-         * *****************************/
-        public override void Search(DataGridView DGV, string searchQuery)
-        {
-            searchQuery = "%" + searchQuery + "%";                              // Add wildcards to the search query
-            MySqlCommand cmd = new MySqlCommand("SEARCH_BUYERS", db.conn);
-            cmd.CommandType = CommandType.StoredProcedure;                        // Name of the stored procedure
-            cmd.Parameters.AddWithValue("@searchQuery", searchQuery.Trim());
-            db.PopulateDGV(DGV, cmd);
-        }
-
-
         
     }
 }

@@ -9,18 +9,13 @@ using System.Windows.Forms;
 
 namespace KPRestoration
 {
-    public class User
+    public class User : Customer
     {
         DatabaseHelper db = new DatabaseHelper();
         private string defaultDGVQuery = "SELECT userID, username, CONCAT(firstName, ' ', lastName) AS Name, email, phone, rank, userStatus FROM Users ORDER BY lastName";
 
         // Members
-        private int id;
         private int rank;
-        private string firstName;
-        private string lastName;
-        private string email;
-        private string phone;
         private string status;
         private string username;
         private string password;
@@ -29,16 +24,12 @@ namespace KPRestoration
 
         /* Getters and setters
          * *******************************/
-        public int Id { get => id; set => id = value; }
         public int Rank { get => rank; set => rank = value; }
-        public string FirstName { get => firstName; set => firstName = value; }
-        public string LastName { get => lastName; set => lastName = value; }
-        public string Email { get => email; set => email = value; }
-        public string Phone { get => phone; set => phone = value; }
         public string Status { get => status; set => status = value; }
         public string Username { get => username; set => username = value; }
         public string Password { get => password; set => password = value; }
         public DateTime RegistrationDate { get => registrationDate; set => registrationDate = value; }
+        
 
         // Default Constructor
         public User()
@@ -92,24 +83,30 @@ namespace KPRestoration
 
         /* Checks if username present in database
          * *******************************/
-        public bool UpdateUser(User myUser)
+        public override bool Update()
         {
-            bool updated = false;
-
-            string query = "UPDATE Users SET username = @username, pass = @password, firstName = @fName, lastName = @lName, email = @email, rank = @rank, userStatus = @status WHERE userID = @userID";
+            string query = "UPDATE Users SET username = @username, pass = @password, firstName = @fName, lastName = @lName, email = @email, phone = @phone, rank = @rank, userStatus = @status WHERE userID = @userID";
             MySqlCommand cmd = new MySqlCommand(query, db.conn);
-            cmd.Parameters.AddWithValue("@username", myUser.Username);
-            cmd.Parameters.AddWithValue("@password", myUser.Password);
-            cmd.Parameters.AddWithValue("@fName", myUser.FirstName);
-            cmd.Parameters.AddWithValue("@lName", myUser.LastName);
-            cmd.Parameters.AddWithValue("@email", myUser.Email);
-            cmd.Parameters.AddWithValue("@rank", myUser.Rank);
-            cmd.Parameters.AddWithValue("@status", myUser.Status);
-
+            cmd.Parameters.AddWithValue("@username", this.Username);
+            cmd.Parameters.AddWithValue("@password", this.Password);
+            cmd.Parameters.AddWithValue("@fName", this.FirstName);
+            cmd.Parameters.AddWithValue("@lName", this.LastName);
+            cmd.Parameters.AddWithValue("@email", this.Email);
+            cmd.Parameters.AddWithValue("@phone", this.Phone);
+            cmd.Parameters.AddWithValue("@rank", this.Rank);
+            cmd.Parameters.AddWithValue("@status", this.Status);
+            cmd.Parameters.AddWithValue("@userID", this.Id);
+            
             if (db.ExecuteCommand(cmd))
-                updated = true;
-
-            return updated;
+            {
+                MessageBox.Show("User information updated successfully!", "Update Complete", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                return true;
+            }
+            else
+            {
+                MessageBox.Show("Error updating user information!", "Update Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                return false;
+            }
         }
 
 
@@ -136,76 +133,6 @@ namespace KPRestoration
                     return false;
             }
             return false;
-        }
-
-
-        /* Add user to database
-         * *******************************/
-        public bool AddUser()
-        {
-            bool userCreated = false;
-            string query = "INSERT INTO Users (username, pass, firstName, lastName, email, phone, registrationDate, rank, userStatus) VALUES " +
-                "(@username, @password, @fName, @lName, @email, @phone, @dateAdded, @rank, @status)";
-            MySqlCommand addUserCMD = new MySqlCommand(query, db.conn);
-            addUserCMD.Parameters.AddWithValue("@username", this.Username);
-            addUserCMD.Parameters.AddWithValue("@password", this.Password);
-            addUserCMD.Parameters.AddWithValue("@fName", this.FirstName);
-            addUserCMD.Parameters.AddWithValue("@lName", this.LastName);
-            addUserCMD.Parameters.AddWithValue("@email", this.Email);
-            addUserCMD.Parameters.AddWithValue("@phone", this.Phone);
-            addUserCMD.Parameters.AddWithValue("@dateAdded", this.RegistrationDate);
-            addUserCMD.Parameters.AddWithValue("@rank", this.Rank);
-            addUserCMD.Parameters.AddWithValue("@status", this.Status);
-            return userCreated = db.ExecuteCommand(addUserCMD);
-        }
-
-
-        /* Delete buyer information
-         * *****************************************/
-        public void Delete()
-        {
-            string query = "DELETE FROM Users WHERE userID = @userID";
-            MySqlCommand cmd = new MySqlCommand(query, db.conn);
-            cmd.Parameters.AddWithValue("@userID", Id);
-
-            try
-            {
-                db.ExecuteCommand(cmd);
-                MessageBox.Show("User deleted successfully!", "Success", MessageBoxButtons.OK, MessageBoxIcon.Information);
-            }
-            catch
-            {
-                MessageBox.Show("Error while attempting to delete the user!", "Delete Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
-            }
-        }
-
-
-        /* Delete user information - takes string and DGV parameters
-         * *****************************************/
-        public void Delete(string name, DataGridView DGV)
-        {
-            System.Windows.Forms.DialogResult DialogResult = MessageBox.Show("Are you sure you want to delete the buyer: \"" + name + "\"?", "Confirm", MessageBoxButtons.YesNo, MessageBoxIcon.Warning);
-            if (DialogResult == DialogResult.Yes) // User confirmed delete
-            {
-                if (name == " ") // No user selected
-                    MessageBox.Show("Please select a user to delete.", "No buyer Selected", MessageBoxButtons.OK, MessageBoxIcon.Warning);
-                else
-                {
-                    string query = "DELETE FROM Users WHERE userID = @userID";
-                    MySqlCommand cmd = new MySqlCommand(query, db.conn);
-                    cmd.Parameters.AddWithValue("@userID", this.Id);
-
-                    try
-                    {
-                        db.ExecuteCommand(cmd);
-                        MessageBox.Show("User deleted successfully!", "Success", MessageBoxButtons.OK, MessageBoxIcon.Information);
-                    }
-                    catch
-                    {
-                        MessageBox.Show("Error while attempting to delete the user!", "Delete Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                    }
-                }
-            }
         }
 
 
@@ -237,7 +164,7 @@ namespace KPRestoration
 
         /* Populate user DGV headers and rows
          * *****************************/
-        public void PopulateDGV(DataGridView DGV)
+        public override void PopulateDGV(DataGridView DGV)
         {
             if (db.PopulateDGV(DGV, defaultDGVQuery))
             {
@@ -250,8 +177,6 @@ namespace KPRestoration
                 DGV.Columns[6].HeaderText = "Status";
                 DGV.Columns[3].AutoSizeMode = DataGridViewAutoSizeColumnMode.AllCells;    // Fixed issue with email address not being fully displayed
             }
-            else
-                MessageBox.Show("There are currently no users in the database.", "No Users Found", MessageBoxButtons.OK, MessageBoxIcon.Warning);
 
         }
 
@@ -262,19 +187,6 @@ namespace KPRestoration
         {
             for (int i = 1; i <= this.Rank; i++)
                 cb.Items.Add(i);
-        }
-
-
-        /* Populates dgvUsers with search results
-         *      Called when user types in search box or clicks search
-         * *****************************/
-        public void Search(DataGridView DGV, string searchQuery)
-        {
-            searchQuery = "%" + searchQuery + "%";                              // Add wildcards to the search query
-            MySqlCommand cmd = new MySqlCommand("SEARCH_USERS", db.conn);
-            cmd.CommandType = CommandType.StoredProcedure;                               // Name of the stored procedure
-            cmd.Parameters.AddWithValue("@searchQuery", searchQuery.Trim());
-            db.PopulateDGV(DGV, cmd);
         }
     }
 }

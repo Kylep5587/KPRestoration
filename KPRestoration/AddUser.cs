@@ -24,7 +24,7 @@ namespace KPRestoration
         User currentUser = new User();
         ManageUsers owner;
         DatabaseHelper db = new DatabaseHelper();
-        Buyer newBuyer = new Buyer();
+        Seller newSeller = new Seller();
         TitleHolder newHolder = new TitleHolder();
 
 
@@ -54,46 +54,11 @@ namespace KPRestoration
         * *****************************************/
         private void btnAddUser_Click(object sender, EventArgs e)
         {
+            string errors = null;
             string password = Globals.Encrypt(txtInitialPass.Text);
-            bool dataConflict = false;
-            string errorMessage = "Please fix the following input errors: \n\n";
-            string errors = "";
-            string phone = txtPhone.Text;
-            bool isValidEmail = false;
+            bool sellerCreated;
+            bool holderCreated;
 
-            // No username entered
-            if (txtUsername.Text == "")
-                errors += "\u2022 Username required\n";
-
-            // Phone validation and formatting
-            if ((phone != "" && phone.Length >= 10) && Globals.IsPhoneNumber(phone))
-                phone = Globals.FormatPhoneNumber(phone); 
-            else if (phone != "" && !Globals.IsPhoneNumber(phone))
-            {
-                errors += "\u2022 Invalid phone number\n";
-                dataConflict = true;
-            }
-            else if (phone == "")
-            {
-                errors += "\u2022 Phone number required\n";
-                dataConflict = true;
-            }
-
-            // Email validation
-            if (txtEmail.Text != "")
-                isValidEmail = Globals.IsEmail(txtEmail.Text);
-            else
-            {
-                errors += "\u2022 Email address required\n";
-                dataConflict = true;
-            }
-                
-            if (txtEmail.Text != "" && !isValidEmail)
-            {
-                errors += "\u2022 Invalid email address\n";
-                dataConflict = true;
-            }
-                
             User newUser = new User
             {
                 Username = txtUsername.Text,
@@ -101,53 +66,43 @@ namespace KPRestoration
                 LastName = txtLastName.Text,
                 Password = password,
                 Email = txtEmail.Text,
-                Phone = phone,
+                Phone = txtPhone.Text,
                 Rank = Convert.ToInt16(cbRank.SelectedItem.ToString()),
                 Status = "Active",
                 RegistrationDate = DateTime.Now
             };
 
+            // Check for input errors
+            errors = newUser.CheckData("User", "New", newUser.Phone, newUser.Email, newUser.FirstName, newUser.LastName, null, null);
 
-            // Ensure username isn't already present
-            if (newUser.Username != "")
+            if (errors == null)
             {
-                if (newUser.UserExists(newUser.Username))
+                newUser.Phone = Globals.FormatPhoneNumber(newUser.Phone.Trim());
+                var userParams = new Dictionary<string, string>
                 {
-                    dataConflict = true;
-                    errors += "\u2022 Username already in use\n";
-                }
-            }
+                    { "@username", newUser.Username },
+                    { "@password", newUser.Password },
+                    { "@fName", newUser.FirstName },
+                    { "@lName", newUser.LastName },
+                    { "@email", newUser.Email },
+                    { "@phone", newUser.Phone },
+                    { "@rank", newUser.Rank.ToString() },
+                    { "@status", newUser.Status }
+                };
 
-            // Ensure email isn't already present
-            if (isValidEmail)
-            {
-                if (newUser.EmailExists(newUser.Email))
-                {
-                    dataConflict = true;
-                    errors += "\u2022 Email address already registered\n";
-                }
-            }
-            
+                if (cbCreateSeller.Checked == true) { }
+                sellerCreated = newSeller.Add(newUser.FirstName, newUser.LastName, newUser.Phone, newUser.Email, newUser.Status);
 
-            if (!dataConflict)
-            {
-                // Insert data into Users, Buyers, and TitleHolders tables - a buyer and title holder is created when a user is created
-                bool userCreated = newUser.AddUser();
-                bool buyerCreated = newBuyer.Add(newUser.FirstName, newUser.LastName, newUser.Phone, newUser.Email, newUser.Status);    
-                bool holderCreated = newHolder.Add(newUser.FirstName, newUser.LastName, newUser.Phone, newUser.Email, newUser.Status);
+                if (cbCreateHolder.Checked == true)
+                    holderCreated = newHolder.Add(newUser.FirstName, newUser.LastName, newUser.Phone, newUser.Email, newUser.Status);
 
-                if (userCreated && buyerCreated && holderCreated)
-                {
-                    MessageBox.Show("User added successfully!");
+                if (newUser.Add("user", userParams))
                     this.Close();
-                }
                 else
                     MessageBox.Show("Error adding user!\n", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
             else
-            {
-                MessageBox.Show(errorMessage + errors, "Invalid Data", MessageBoxButtons.OK, MessageBoxIcon.Warning);
-            }
+                MessageBox.Show("Please correct the following errors and try again: \n" + errors, "Update Error", MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
         }
 
 

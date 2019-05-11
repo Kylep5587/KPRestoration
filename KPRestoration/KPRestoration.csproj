@@ -52,6 +52,18 @@
     <Compile Include="AddBuyer.Designer.cs">
       <DependentUpon>AddBuyer.cs</DependentUpon>
     </Compile>
+    <Compile Include="AddSeller.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="AddSeller.Designer.cs">
+      <DependentUpon>AddSeller.cs</DependentUpon>
+    </Compile>
+    <Compile Include="AddTitleHolder.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="AddTitleHolder.Designer.cs">
+      <DependentUpon>AddTitleHolder.cs</DependentUpon>
+    </Compile>
     <Compile Include="AddUser.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -96,6 +108,12 @@
     </Compile>
     <EmbeddedResource Include="AddBuyer.resx">
       <DependentUpon>AddBuyer.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="addSeller.resx">
+      <DependentUpon>AddSeller.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="AddTitleHolder.resx">
+      <DependentUpon>AddTitleHolder.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="AddUser.resx">
       <DependentUpon>AddUser.cs</DependentUpon>

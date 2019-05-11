@@ -192,9 +192,10 @@ namespace KPRestoration
                     CloseConnection();
                     return true;
                 }
-                catch (Exception)
+                catch (Exception ex)
                 {
                     CloseConnection();
+                    MessageBox.Show("Command Error: " + ex.Message);
                     return false;
                 }
             }

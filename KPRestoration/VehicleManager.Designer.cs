@@ -97,7 +97,7 @@
             this.tabVehicleManager.Controls.Add(this.tabOverveiw);
             this.tabVehicleManager.Controls.Add(this.tabAddVehicle);
             this.tabVehicleManager.Controls.Add(this.tabPage1);
-            this.tabVehicleManager.Dock = System.Windows.Forms.DockStyle.Top;
+            this.tabVehicleManager.Dock = System.Windows.Forms.DockStyle.Fill;
             this.tabVehicleManager.Location = new System.Drawing.Point(0, 0);
             this.tabVehicleManager.Name = "tabVehicleManager";
             this.tabVehicleManager.SelectedIndex = 0;
@@ -644,17 +644,12 @@
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.AutoScroll = true;
-            this.AutoSize = true;
-            this.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
             this.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(239)))), ((int)(((byte)(239)))), ((int)(((byte)(239)))));
             this.ClientSize = new System.Drawing.Size(1032, 533);
             this.Controls.Add(this.tabVehicleManager);
             this.Font = new System.Drawing.Font("Tahoma", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.None;
             this.Name = "VehicleManager";
-            this.Text = "Vehcile Manager";
-            this.WindowState = System.Windows.Forms.FormWindowState.Maximized;
+            this.Text = "Vehicle Manager";
             this.tabVehicleManager.ResumeLayout(false);
             this.tabOverveiw.ResumeLayout(false);
             this.tabOverveiw.PerformLayout();

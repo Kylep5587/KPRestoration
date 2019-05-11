@@ -23,7 +23,7 @@ namespace KPRestoration
         DatabaseHelper db = new DatabaseHelper();
         User currentUser;
         ManageUsers owner;
-        Buyer tempBuyer = new Buyer();
+        Buyer newBuyer = new Buyer();
 
         /* Constructor
          * ******************************/
@@ -51,9 +51,8 @@ namespace KPRestoration
          * ******************************/
         private void btnAddBuyer_Click(object sender, EventArgs e)
         {
-            bool dataConflict = false;
             string errorMessage = "Please fix the following input errors: \n\n";
-            string errors = tempBuyer.CheckData("Buyer", "New", txtPhone.Text, txtEmail.Text, txtFirstName.Text, txtLastName.Text, txtBuyerZip.Text); // Check for valid data
+            string errors = newBuyer.CheckData("Buyer", "New", txtPhone.Text, txtEmail.Text, txtFirstName.Text, txtLastName.Text, txtBuyerZip.Text, null); // Check for valid data
 
             // Create user if proper input detected
             if (errors == null)
@@ -72,16 +71,24 @@ namespace KPRestoration
                     Zip = Convert.ToInt32(txtBuyerZip.Text.Trim()),
                     BuyerStatus = cbStatus.SelectedItem.ToString()
                 };
-                
-                if (errors != null)
-                    dataConflict = true; // Set data conflict to true if CheckDataConflict returns an error string that is not null
 
                 // Insert buyer data
-                if (!dataConflict)
+                if (errors == null)
                 {
-                    bool buyerAdded = newBuyer.Add(); // Attempt to insert buyer data
+                    var buyerParams = new Dictionary<string, string>
+                    {
+                        { "@fName", newBuyer.FirstName },
+                        { "@lName", newBuyer.LastName },
+                        { "@address", newBuyer.Address },
+                        { "@city", newBuyer.City },
+                        { "@state", newBuyer.State },
+                        { "@zip", newBuyer.Zip.ToString() },
+                        { "@phone", newBuyer.Phone },
+                        { "@email", newBuyer.Email },
+                        { "@status", newBuyer.BuyerStatus }
+                    };
 
-                    if (buyerAdded)
+                    if (newBuyer.Add("buyer", buyerParams))
                         this.Close();
                     else
                         MessageBox.Show("Error adding buyer!\n", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);

@@ -24,15 +24,9 @@ namespace KPRestoration
 
         private void btnUsers_Click(object sender, EventArgs e)
         {
-            ManageUsers userForm = new ManageUsers(currentUser)
-            {
-                MdiParent = this,
-                Dock = DockStyle.Fill
-            };
-            panelContent.Controls.Add(userForm);
-            userForm.Show();
-            this.Text = "Manage Users";
-            this.Refresh();
+            ManageUsers u = new ManageUsers(currentUser);
+            Globals.CreateForm(u, panelContent);
+            Text = "Manage Users";
         }
 
         // Fixes: application remains running after closing window
@@ -43,15 +37,9 @@ namespace KPRestoration
 
         private void btnVehicleManager_Click(object sender, EventArgs e)
         {
-            VehicleManager vehicleForm = new VehicleManager(currentUser)
-            {
-                MdiParent = this,
-                Dock = DockStyle.Fill
-            };
-            panelContent.Controls.Add(vehicleForm);
-            vehicleForm.Show();
-            this.Text = "Vehicle Manager";
-            this.Refresh();
+            VehicleManager v = new VehicleManager(currentUser);
+            Globals.CreateForm(v, panelContent);
+            Text = "Vehicle Manager";
         }
     }
 }

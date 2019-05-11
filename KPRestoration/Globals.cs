@@ -30,6 +30,22 @@ namespace KPRestoration
         private static string[] stateList = { "AK", "AL", "AR", "AZ", "CA", "CO", "CT", "DC", "DE", "FL", "GA", "GU", "HI", "IA", "ID", "IL", "IN", "KS", "KY", "LA", "MA", "MD", "ME", "MH", "MI", "MN", "MO", "MS", "MT", "NC", "ND", "NE", "NH", "NJ", "NM", "NV", "NY", "OH", "OK", "OR", "PA", "PR", "PW", "RI", "SC", "SD", "TN", "TX", "UT", "VA", "VI", "VT", "WA", "WI", "WV", "WY" };
 
 
+        /* Create child form
+         * ***************************************/
+        public static void CreateForm(Form child, Panel p)
+        {
+            p.Controls.Clear();
+            child.TopLevel = false;
+            p.Controls.Add(child);
+            child.FormBorderStyle = System.Windows.Forms.FormBorderStyle.None;
+            child.WindowState = FormWindowState.Normal;
+            child.AutoSize = false;
+            child.AutoSizeMode = AutoSizeMode.GrowOnly;
+            child.Dock = DockStyle.Fill;
+            child.Show();
+        }
+
+
         /*  Used to populate a ComboBox with state abbreviations
          *  **************************************/
         public static void PopulateStateList(ComboBox stateBox)
